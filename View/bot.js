@@ -20,20 +20,20 @@ function checkForInjection(message) {
 
 // make an announcement for a given time table
 async function makeExpAnnouncement(clanName = 'Sorrow Knights', numTop = 5, time = 'daily') {
-	var announcement = ` top gains were:`;
+	var announcement = ` top gains are:`;
 	//await clan.updateClan('Sorrow Knights');
 	var res;
 	switch(time) {
 		case 'daily':
-		announcement = "Yesterday's " + announcement;
+		announcement = "Today's " + announcement;
 		res = await clan.calculateTopExpDaily(clanName, numTop);
 		break;
 		case 'weekly':
-		announcement = "Last week's " + announcement;
+		announcement = "This week's " + announcement;
 		res = await clan.calculateTopExpWeekly(clanName, numTop);
 		break;
 		case 'monthly':
-		announcement = "Last month's " + announcement;
+		announcement = "This month's " + announcement;
 		res = await clan.calculateTopExpMonthly(clanName, numTop);
 		break;
 	}
@@ -46,9 +46,7 @@ async function makeExpAnnouncement(clanName = 'Sorrow Knights', numTop = 5, time
 
 // at 5 pm every day update daily
 var daily_update = schedule.scheduleJob('30 16 * * *', function(){
-	clan.addNewMembers().then(res => {
-		clan.updateClan();
-	});
+	clan.updateClan('Sorrow Knights');
 })
 
 var daily_job = schedule.scheduleJob('0 17 * * *', function(){
