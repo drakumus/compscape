@@ -102,7 +102,7 @@ async function calculateTopExp(clan, timeSlot, numTop) {
         var currentTotal = calculateTotalExp(current_data[i]);
         var timedTotal = calculateTotalExp(timed_data[i]);
         var total = currentTotal - timedTotal;
-        if(total > 0) memberTotals[name] = total; 
+        if(total > 0 && timedTotal > 0) memberTotals[name] = total; 
     }
 
     // sort the list until the top x players have been found

@@ -45,7 +45,7 @@ async function makeExpAnnouncement(clanName = 'Sorrow Knights', numTop = 5, time
 }
 
 // at 5 pm every day update daily
-var daily_update = schedule.scheduleJob('30 16 * * *', function(){
+var daily_update = schedule.scheduleJob('30 * * * *', function(){
 	clan.updateClan('Sorrow Knights');
 })
 
