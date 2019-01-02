@@ -1,5 +1,6 @@
 var rp = require('request-promise');
 
+// conversion table for the skill ids provided by the runemetric endpoint to readable skill names
 const skill_id_lookup = {
 	0:	"Attack",
 	1:	"Defence",
@@ -33,8 +34,10 @@ const endpoint = "https://apps.runescape.com/runemetrics/profile/profile?user=";
 const exp_cap = 13034431;
 const elite_exp_cap = 36073511;
 
-
-
+/**
+ * Gets the user's data from the runemetric endpoint
+ * @param {String} user user's rsn
+ */
 async function getUserData(user) {
 	let options = {
     uri: endpoint+user,
@@ -44,6 +47,11 @@ async function getUserData(user) {
 	return res;
 }
 
+/**
+ * Uses the getUserData function to make a human readable list of user's exp and level
+ * @param {String} user user's rsn
+ * @returns {Array} with index values of {xp: number, level: number}
+ */
 async function listSkills(user) {
 	let data = await getUserData(user);
 	let raw = data.skillvalues;
@@ -59,6 +67,10 @@ async function listSkills(user) {
 	return skills;
 }
 
+/**
+ * Calculates experience remianing for a player to max in runescape 3
+ * @param {String} user name of the user to calculate
+ */
 async function calcExpToMax(user) {
 	let skills = await listSkills(user);
 	var expRemaining = 0;
@@ -79,7 +91,7 @@ async function calcExpToMax(user) {
 	return expRemaining;
 }
 
-//calcExpToMax("Z0CI");
 module.exports = {
-	calcExpToMax
+	calcExpToMax,
+	listSkills
 }
