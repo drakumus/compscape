@@ -53,7 +53,19 @@ var daily_update = schedule.scheduleJob('30 * * * *', function(){
 // at 0 gmt
 var daily_job = schedule.scheduleJob('0 0 * * *', function(){
 	// calculate the last days top exp and send to discord channel
-	var numTop = 5;
+	var numTop = 10;
+	var d = new Date();
+	var weekday = new Array(7);
+	weekday[0] = "Sunday";
+	weekday[1] = "Monday";
+	weekday[2] = "Tuesday";
+	weekday[3] = "Wednesday";
+	weekday[4] = "Thursday";
+	weekday[5] = "Friday";
+	weekday[6] = "Saturday";
+
+	var n = weekday[d.getDay()];
+	hook.send("---------" + n + "---------");
 	makeExpAnnouncement('Sorrow Knights',numTop, 'daily').then(res => {
 		clan.setDailyXP();
 	});
