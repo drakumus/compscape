@@ -75,6 +75,16 @@ async function getClanData(clan, table = 'experience') {
     return raw;
 }
 
+async function getUserData(name, table = 'experience') {
+    isCon = await init_connection();
+    if(!isCon) return null;
+
+    const raw = await query_db(`SELECT * FROM user LEFT JOIN ${table} ON user.id = ${table}.user_id WHERE name = '${name}'`);
+    close_connection();
+
+    return raw;
+}
+
 // this extrapolates the raw skill data of atk, str, and so on from a client query to runescape's runemetric lite endpoint.
 async function extractSkillData(name) { 
     var raw = await max.listSkills(name).catch(function (rej){
@@ -87,6 +97,22 @@ async function extractSkillData(name) {
         }
     }
     return skillData;
+}
+
+async function extractSkillDataTable(name, table) {
+    var raw = (await getUserData(name, table))[0];
+    var data = {}
+    if(typeof raw !== "object") {
+        return data;
+    }
+    for(var i in raw) {
+        var value = raw[i];
+        if(typeof value == "number" && i != 'id' && i != 'user_id') {
+            data[i] = value;
+        }
+    }
+
+    return data;
 }
 
 // get an id for a single user
@@ -401,7 +427,7 @@ async function testRemoveUsers() {
 
 async function testCode(){
     
-    var result = await updateExpUser('Boomshot2k7');
+    var result = await extractSkillDataTable('Boomshot2k7');
     console.log(result);
     //var result = await testAddUsers(['Z0CI', 'Wet Tofu'], 'Sorrow Knights');//await updateExpUsers(['Z0CI','10redturtle','Evil Fax', 'Sockobird']);
     //console.log(result);
@@ -425,5 +451,7 @@ module.exports = {
     removeUser,
     getClanMembers,
     duplicateTable,
-    getClanData
+    getClanData,
+    getUserData,
+    extractSkillDataTable
 }

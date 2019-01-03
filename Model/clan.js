@@ -1,4 +1,5 @@
 const db = require(`./database.js`);
+const max = require(`./max.js`)
 var rp = require('request-promise');
 
 // handles all communicate between the bot and what the clan data management needs to do functionally.
@@ -85,6 +86,50 @@ function calculateTotalExp(rowdata) {
     return total;
 }
 
+function difSkills(skillData1, skillData2) {
+    var result = {}
+    for(var skill in skillData1) {
+        result[skill] = skillData1[skill] - skillData2[skill];
+    }
+
+    return result;
+}
+
+async function getUserTable(name) {
+    await db.updateExpUser(name, 'experience');
+    var currentExp = await db.extractSkillDataTable(name, 'experience');
+    var dailyExp = await db.extractSkillDataTable(name, 'daily');
+    var weeklyExp = await db.extractSkillDataTable(name, 'weekly');
+    var monthlyExp = await db.extractSkillDataTable(name, 'monthly');
+    var dailyExpDif = difSkills(currentExp, dailyExp);
+    var weeklyExpDif = difSkills(currentExp, weeklyExp);
+    var monthlyExpDif = difSkills(currentExp, monthlyExp);
+    
+    var currentTotal = calculateTotalExp(currentExp);
+    var dailyTotal = currentTotal - calculateTotalExp(dailyExp);
+    var weeklyTotal = currentTotal - calculateTotalExp(weeklyExp);
+    var monthlyTotal = currentTotal - calculateTotalExp(monthlyExp);
+    
+
+    var table = [['Skill', 'Exp', 'Daily', 'Weekly']]//, 'Weekly', 'Monthly']];
+    table.push(['Total Exp', currentTotal.toLocaleString(), dailyTotal.toLocaleString(), weeklyTotal.toLocaleString()]);
+
+    for(var i in max.skill_id_lookup) {
+        var skill = max.skill_id_lookup[i];
+        var lowerCaseSkill = skill.toLowerCase();
+        table.push([skill, currentExp[lowerCaseSkill].toLocaleString(),dailyExpDif[lowerCaseSkill].toLocaleString(), weeklyExpDif[lowerCaseSkill].toLocaleString()]);//, monthlyExpDif[skill.toLowerCase()]]);
+        // if(i === "0")
+        //     table.push([skill, currentExp[lowerCaseSkill],dailyExpDif[lowerCaseSkill]]);//, weeklyExpDif[skill.toLowerCase()], monthlyExpDif[skill.toLowerCase()]]);
+        // else {
+        //     table[1][0] += "\n" + skill;
+        //     table[1][1] += "\n" + currentExp[lowerCaseSkill];
+        //     table[1][2] += "\n" + dailyExpDif[lowerCaseSkill];
+        // }
+    }
+
+    return table;
+}
+
 /**
  * Performs a dif on the total exp for the experience table and a given time table (daily, weekly, monthly).
  * The dif list is then sorted and the numTop users are presented.
@@ -165,6 +210,13 @@ async function setMonthlyXp() {
 //setMonthlyXp('Sorrow Knights');
 //addNewMembers('Sorrow Knights');
 
+async function testCode() {
+    var result = await getUserTable('Z0CI');
+    console.log(result);
+}
+
+//testCode();
+
 module.exports = {
     getClanMembers,
     addClan,
@@ -175,5 +227,6 @@ module.exports = {
     setMonthlyXp,
     calculateTopExpDaily,
     calculateTopExpWeekly,
-    calculateTopExpMonthly
+    calculateTopExpMonthly,
+    getUserTable
 }

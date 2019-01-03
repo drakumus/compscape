@@ -93,5 +93,6 @@ async function calcExpToMax(user) {
 
 module.exports = {
 	calcExpToMax,
-	listSkills
+	listSkills,
+	skill_id_lookup
 }
