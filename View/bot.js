@@ -42,7 +42,7 @@ async function makeExpAnnouncement(clanName = 'Sorrow Knights', numTop = 5, time
 		if(typeof res[i].name != 'undefined')
 			announcement += `\n${i+1}) ${res[i].name} at ${res[i].exp.toLocaleString()}` + " exp.";
 	}
-	hook.send(announcement); // have the hook send the announcement
+	hook.send("```\n" + announcement + "\n```"); // have the hook send the announcement
 }
 
 // every hour on the 30min mark
@@ -64,8 +64,11 @@ var daily_job = schedule.scheduleJob('0 0 * * *', function(){
 	weekday[5] = "Friday";
 	weekday[6] = "Saturday";
 
-	var n = weekday[d.getDay()];
-	hook.send("---------" + n + "---------");
+	var day = d.getDate() - 1;
+	if(day < 0) day = 6;
+
+	var n = weekday[day];
+	hook.send("----------" + n + "----------");
 	makeExpAnnouncement('Sorrow Knights',numTop, 'daily').then(res => {
 		clan.setDailyXP();
 	});
