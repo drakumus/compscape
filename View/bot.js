@@ -174,6 +174,49 @@ client.on('message', msg => {
 		} else {
 			msg.reply('Please provide the username you wish to check.');
 		}
+	} else if(command === "!canjoin") {
+		// concatenate the username args
+		if(args.length >= 2) {
+			// concatenate the username args
+			var name = "";
+			for(var i = 1; i < args.length; i++) {
+				name += args[i];
+				if(i != args.length-1) name += " ";
+			}
+			max.canTheyJoinTheClan(name).then(res => {
+				if(res) {
+					msg.channel.send(name + " is eligible to join the clan!");
+				} else {
+					msg.channel.send("Unfortunately, " + name + " does not meet the minimum requirements to join the clan.");
+				}
+				max.getHiscoreTable(name).then(res => {
+					var config = {
+						drawHorizontalLine: (index, size) => {
+							return index === 0 || index === 1 || index === size;
+						},
+						columns: {
+							0: {
+								alignment: 'left',
+								minWidth: 5
+							},
+							1: {
+								alignment: 'right',
+								minWidth: 5
+							},
+							2: {
+								alignment: 'right',
+								minWidth: 5
+							}
+						}
+					};
+					var t = table(res, config);
+					msg.channel.send('```\n' + t + '\n```');
+				})
+			})//.catch( rej => {
+			//	console.log(rej);
+			//	msg.channel.send('Invalid username.');
+			//});
+		}
 	}
   }
 });

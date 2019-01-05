@@ -30,7 +30,8 @@ const skill_id_lookup = {
 	25:	"Divination",
 	26:	"Invention"
 };
-const endpoint = "https://apps.runescape.com/runemetrics/profile/profile?user=";
+const runemetric_endpoint = "https://apps.runescape.com/runemetrics/profile/profile?user=";
+const hiscore_endpoint = "https://secure.runescape.com/m=hiscore/index_lite.ws?player=";
 const exp_cap = 13034431;
 const elite_exp_cap = 36073511;
 
@@ -40,11 +41,29 @@ const elite_exp_cap = 36073511;
  */
 async function getUserData(user) {
 	let options = {
-    uri: endpoint+user,
+    uri: runemetric_endpoint+user,
     json: true // Automatically parses the JSON string in the response
 	};
 	let res = await rp(options);
 	return res;
+}
+
+async function getHiscoreData(user) {
+	let options = {
+		uri: hiscore_endpoint+user
+	}
+	let hiscores = await rp(options);
+	let h_string_arr = hiscores.split(/\r?\n/)
+	let skills = await listSkills(user);
+	let data = {}
+	let value = h_string_arr[0].split(',');
+	data["Total"] = { level: value[1], exp: value[2] };
+	for(let i = 1; i < 28; i++) {
+		value = h_string_arr[i].split(',');
+		data[skill_id_lookup[i-1]] = { level: value[1], exp: value[2]};
+	}
+
+	return data;
 }
 
 /**
@@ -91,8 +110,51 @@ async function calcExpToMax(user) {
 	return expRemaining;
 }
 
+async function getHiscoreTable(user) {
+	var hiscores = await getHiscoreData(user);
+	var table = [["Skill", "Level", "Exp"]];
+	for(var skill in hiscores) {
+		table.push([skill, hiscores[skill].level, hiscores[skill].exp]);
+	}
+	return table;
+}
+
+async function canTheyJoinTheClan(user) {
+	var hiscores = await getHiscoreData(user);
+	var combat = await calcCombatLevel(user);
+	if(hiscores.Total.level >= 1500)
+		return true;
+	if(combat >= 100)
+		return true;
+	for(var skill in hiscores) {
+		if(skill !== "Total"){
+			if(Number(hiscores[skill].level) === 99)
+				return true;
+		}
+	}
+	return false;
+}
+
+async function calcCombatLevel(user) {
+	var hiscore = await getHiscoreData(user);
+	var Att = Number(hiscore.Attack.level);
+	var Str = Number(hiscore.Strength.level);
+	var Mag = Number(hiscore.Magic.level);
+	var Rng = Number(hiscore.Ranged.level);
+	var Def = Number(hiscore.Defence.level);
+	var Const = Number(hiscore.Constitution.level);
+	var Pray = Number(hiscore.Prayer.level);
+	var Summ = Number(hiscore.Summoning.level);
+	var result = ((13/10) * Math.max((Att+Str), 2*Mag, 2*Rng) + Def + Const + (0.5 * Pray) + (0.5 * Summ))/4;
+	return result;
+}
+
 module.exports = {
 	calcExpToMax,
 	listSkills,
-	skill_id_lookup
+	skill_id_lookup,
+	calcCombatLevel,
+	canTheyJoinTheClan,
+	getHiscoreTable,
+	getHiscoreData
 }
