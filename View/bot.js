@@ -54,21 +54,8 @@ var daily_update = schedule.scheduleJob('30 * * * *', function(){
 var daily_job = schedule.scheduleJob('0 0 * * *', function(){
 	// calculate the last days top exp and send to discord channel
 	var numTop = 10;
-	var d = new Date();
-	var weekday = new Array(7);
-	weekday[0] = "Sunday";
-	weekday[1] = "Monday";
-	weekday[2] = "Tuesday";
-	weekday[3] = "Wednesday";
-	weekday[4] = "Thursday";
-	weekday[5] = "Friday";
-	weekday[6] = "Saturday";
 
-	var day = d.getDate() - 1;
-	if(day < 0) day = 6;
-
-	var n = weekday[day];
-	hook.send("----------" + n + "----------");
+	//hook.send("----------" + n + "----------");
 	makeExpAnnouncement('Sorrow Knights',numTop, 'daily').then(res => {
 		clan.setDailyXP();
 	});
@@ -134,7 +121,7 @@ client.on('message', msg => {
 		// gives the current top X players for the monthly time table
 		clanChannel = msg.channel;
 		makeExpAnnouncement('Sorrow Knights', 5, 'monthly');
-	} else if(command === '!exp') {
+	} else if(command === '!exp' || command === '!Exp') {
 		if(args.length >= 2) {
 			// concatenate the username args
 			var name = "";
@@ -216,6 +203,22 @@ client.on('message', msg => {
 			//	console.log(rej);
 			//	msg.channel.send('Invalid username.');
 			//});
+		}
+	} else if (command.toUpperCase() === '!clanexp'.toUpperCase()) {
+		if(args.length >= 2) {
+			var name = "";
+			for(var i = 1; i < args.length; i++) {
+				name += args[i];
+				if(i != args.length-1) name += " ";
+			}
+
+			clan.getClanExp(name).then(res => {
+				if(res.length > 0) {
+					msg.channel.send(name+"'s total exp since joining the clan is: " + res.toLocaleString());
+				}
+			}).catch(err => {
+				msg.channel.send("Failed to find user data. Are they in the clan?")
+			});
 		}
 	}
   }

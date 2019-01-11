@@ -16,7 +16,21 @@ const clan_member_endpoint = "http://services.runescape.com/m=clan-hiscores/memb
  * The endpoint returns more than just clan members. Possibly useful information from this enpoint includes
  * XP since joining the clan, date joined, rank
  */
+
+async function getClanData(clan) {
+    const clan_member_url = clan_member_endpoint + clan;
+    let options = {
+        uri: clan_member_url
+    };
+    let res = await rp(options);
+    var arr = res.split('\n');
+    arr.shift();
+    
+    return arr;
+}
+
 async function getClanMembers(clan) {
+    var arr = await getClanData(clan);
     const clan_member_url = clan_member_endpoint + clan;
     let options = {
         uri: clan_member_url
@@ -37,6 +51,37 @@ async function getClanMembers(clan) {
     });
     //console.log(members);
     return members;
+}
+
+async function getClanUserData(clan) {
+    var arr = await getClanData(clan);
+    var memberData = {}
+    for(var i in arr) {
+        var data = arr[i].split(',');
+
+        var name = data[0];
+        const oldstring = "�";
+        const newstring = " ";
+        while (name.indexOf(oldstring) > -1) {
+            name = name.replace(oldstring, newstring);
+        }
+
+        if(name.length > 0) {
+            memberData[name] = {
+                rank: data[1],
+                exp: data[2],
+                kills: data[3]
+            }
+        }
+    }
+
+    return memberData;
+}
+
+async function getClanExp(user) {
+    var clanData = await getClanUserData('Sorrow Knights');
+
+    return clanData[user].exp;
 }
 
 /**
@@ -228,5 +273,7 @@ module.exports = {
     calculateTopExpDaily,
     calculateTopExpWeekly,
     calculateTopExpMonthly,
-    getUserTable
+    getUserTable,
+    getClanUserData,
+    getClanExp
 }
