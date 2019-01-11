@@ -214,7 +214,7 @@ client.on('message', msg => {
 
 			clan.getClanExp(name).then(res => {
 				if(res.length > 0) {
-					msg.channel.send(name+"'s total exp since joining the clan is: " + res.toLocaleString());
+					msg.channel.send(name+" has gained a total of " + parseInt(res, 10).toLocaleString() + " exp since joining the clan.");
 				}
 			}).catch(err => {
 				msg.channel.send("Failed to find user data. Are they in the clan?")
