@@ -67,7 +67,7 @@ async function getClanUserData(clan) {
         }
 
         if(name.length > 0) {
-            memberData[name] = {
+            memberData[name.toLowerCase()] = {
                 rank: data[1],
                 exp: data[2],
                 kills: data[3]
@@ -81,7 +81,7 @@ async function getClanUserData(clan) {
 async function getClanExp(user) {
     var clanData = await getClanUserData('Sorrow Knights');
 
-    return clanData[user].exp;
+    return clanData[user.toLowerCase()].exp;
 }
 
 /**

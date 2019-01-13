@@ -53,8 +53,7 @@ async function getHiscoreData(user) {
 		uri: hiscore_endpoint+user
 	}
 	let hiscores = await rp(options);
-	let h_string_arr = hiscores.split(/\r?\n/)
-	let skills = await listSkills(user);
+	let h_string_arr = hiscores.split(/\r?\n/);
 	let data = {}
 	let value = h_string_arr[0].split(',');
 	data["Total"] = { level: value[1], exp: value[2] };
