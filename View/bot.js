@@ -63,7 +63,7 @@ var daily_job = schedule.scheduleJob('0 0 * * *', function(){
 });
 
 // at 0 gmt every Wed update weekly
-var weekly_job = schedule.scheduleJob('0 0 * * 3', function(){
+var weekly_job = schedule.scheduleJob('0 0 * * 1', function(){
 	// calculate the last week's top exp and send to discord channel
 	var numTop = 5;
 	makeExpAnnouncement('Sorrow Knights', 5, 'weekly').then (res => {

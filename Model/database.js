@@ -87,13 +87,21 @@ async function getUserData(name, table = 'experience') {
 
 // this extrapolates the raw skill data of atk, str, and so on from a client query to runescape's runemetric lite endpoint.
 async function extractSkillData(name) { 
-    var raw = await max.listSkills(name).catch(function (rej){
+    var raw = await max.listSkills(name).catch(function (rej) {
         return {};
     });
     var skillData = {};
     if(raw["Ranged"] != null) {
         for(var skill in raw) {
             skillData[skill] = raw[skill].xp/10;
+        }
+    } else {
+        // runemetric profile is not public
+        raw = await max.getHiscoreData(name).catch(function (rej) {
+            return {};
+        });
+        for(var skill in raw) {
+            skillData[skill] = parseInt(raw[skill].exp, 10);;
         }
     }
     return skillData;
@@ -439,7 +447,7 @@ async function testCode(){
 //updateUser('Boomshot2k7');
 //removeUser('Boomshot2k7');
 //testCode();
-
+addExpUser("Silver Charm");
 
 module.exports = {
     addUser,
