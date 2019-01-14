@@ -203,6 +203,8 @@ client.on('message', msg => {
 			//	console.log(rej);
 			//	msg.channel.send('Invalid username.');
 			//});
+		} else {
+			msg.reply('Please provide the username you wish to check.');
 		}
 	} else if (command.toUpperCase() === '!clanexp'.toUpperCase()) {
 		if(args.length >= 2) {
@@ -219,6 +221,36 @@ client.on('message', msg => {
 			}).catch(err => {
 				msg.channel.send("Failed to find user data. Are they in the clan?")
 			});
+		} else {
+			msg.reply('Please provide the username you wish to check.');
+		}
+	} else if (command.toUpperCase() === '!rank'.toUpperCase()) {
+		if(args.length >= 2) {
+			var name = "";
+			for(var i = 1; i < args.length; i++) {
+				name += args[i];
+				if(i != args.length-1) name += " ";
+			}
+
+			clan.getUserRank(name, `Sorrow Knights`, `combat`, `weekly`).then(res => {
+				if(Object.keys(res).length > 0) {
+					msg.channel.send("**COMBAT:** Rank " + res.rank + " at " + res.exp.toLocaleString() + " exp.");
+				} else {
+					msg.channel.send("No combat exp gained.");
+				}
+			}).then( res => {
+				clan.getUserRank(name, 'Sorrow Knights', 'skilling', 'weekly').then(res => {
+					if(Object.keys(res).length > 0) {
+						msg.channel.send("**SKILLING:** Rank " + res.rank + " at " + res.exp.toLocaleString() + " exp.");
+					} else {
+						msg.channel.send("No skilling exp gained.");
+					}
+				})
+			}).catch(err => {
+				msg.channel.send("Failed to find user data. Or no exp gained.")
+			});
+		} else {
+			msg.reply('Please provide the username you wish to check.');
 		}
 	}
   }

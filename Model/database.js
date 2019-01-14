@@ -446,8 +446,7 @@ async function testCode(){
 //updateUser('Z0CI');
 //updateUser('Boomshot2k7');
 //removeUser('Boomshot2k7');
-//testCode();
-addExpUser("Silver Charm");
+//testCode();S
 
 module.exports = {
     addUser,

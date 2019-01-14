@@ -131,6 +131,36 @@ function calculateTotalExp(rowdata) {
     return total;
 }
 
+function calculateCombatExp(rowdata) {
+    let combat = ['attack', 'strength', 'defence', 'constitution', 'ranged', 'magic', 'slayer', 'prayer', 'summoning']
+    var total = 0;
+    if(typeof rowdata !== "object") {
+        return total;
+    }
+    for(var i in rowdata) {
+        var data = rowdata[i];
+        if(typeof data === "number" && i != 'id' && i != 'user_id' && combat.indexOf(i) >= 0) {
+            total += data;
+        }
+    }
+    return total;
+}
+
+function calculateSkillingExp(rowdata) {
+    let combat = ['attack', 'strength', 'defence', 'constitution', 'ranged', 'magic', 'slayer', 'prayer', 'summoning', 'invention']
+    var total = 0;
+    if(typeof rowdata !== "object") {
+        return total;
+    }
+    for(var i in rowdata) {
+        var data = rowdata[i];
+        if(typeof data === "number" && i != 'id' && i != 'user_id' && combat.indexOf(i) < 0) {
+            total += data;
+        }
+    }
+    return total;
+}
+
 function difSkills(skillData1, skillData2) {
     var result = {}
     for(var skill in skillData1) {
@@ -209,6 +239,52 @@ async function calculateTopExp(clan, timeSlot, numTop) {
     return top; // formate {name: String, exp: number}
 }
 
+async function getUserRank(user, clan, catagory = "all", timeSlot) {
+    var current_data = await db.getClanData(clan);
+    var timed_data = await db.getClanData(clan, timeSlot);
+    var memberTotals = {};
+
+    for(var i in timed_data) {
+        var name = timed_data[i].name;
+        var currentTotal, timedTotal;
+        if(catagory === "all") {
+            currentTotal = calculateTotalExp(current_data[i])
+            timedTotal = calculateTotalExp(timed_data[i]);
+        } else if (catagory === "combat") {
+            currentTotal = calculateCombatExp(current_data[i])
+            timedTotal = calculateCombatExp(timed_data[i]);
+        } else if (catagory === "skilling") {
+            currentTotal = calculateSkillingExp(current_data[i])
+            timedTotal = calculateSkillingExp(timed_data[i]);
+        }
+        var total = currentTotal - timedTotal;
+        if(total > 0 && timedTotal > 0) memberTotals[name] = total;
+    }
+
+    // sort the list
+    var sorted = [];
+    for(var i = 0; i < Object.keys(memberTotals).length; i++) {
+        var largest = Object.keys(memberTotals)[0];
+        for(var p in memberTotals) {
+            if(memberTotals[p] > memberTotals[largest]) largest = p;
+        }
+        sorted.push({name: largest, exp: memberTotals[largest]});
+        delete memberTotals[largest];
+    }
+    
+    var rank = -1;
+
+    for(var i in sorted) {
+        if(sorted[i].name.toLowerCase() === user.toLowerCase()) {
+            rank = parseInt(i, 10) + 1;
+            break;
+        }
+    }
+    let result = {}
+    if(rank !== -1) result = {rank: rank, exp: sorted[rank-1].exp };
+    return result;
+}
+
 // uses the calculate top method with the daily table
 async function calculateTopExpDaily(clan, numTop) {
     const result = await calculateTopExp(clan, 'daily', numTop);
@@ -261,6 +337,7 @@ async function testCode() {
 }
 
 //testCode();
+//getUserRank(`Z0CI`, `Sorrow Knights`, "combat", "daily");
 
 module.exports = {
     getClanMembers,
@@ -275,5 +352,6 @@ module.exports = {
     calculateTopExpMonthly,
     getUserTable,
     getClanUserData,
-    getClanExp
+    getClanExp,
+    getUserRank
 }
