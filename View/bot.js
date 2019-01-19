@@ -20,27 +20,56 @@ function checkForInjection(message) {
 }
 
 // make an announcement for a given time table
-async function makeExpAnnouncement(clanName = 'Sorrow Knights', numTop = 5, time = 'daily') {
-	var announcement = ` top gains are:`;
+async function makeExpAnnouncement(clanName = 'Sorrow Knights', numTop = 5, time = 'daily', isSplit = false) {
+	var announcement = `top gains are:`;
 	//await clan.updateClan('Sorrow Knights');
-	var res;
+	var total, combat, skilling;
 	switch(time) {
 		case 'daily':
-		announcement = "Today's " + announcement;
-		res = await clan.calculateTopExpDaily(clanName, numTop);
-		break;
+			announcement = "Today's " + announcement;
+			if(!isSplit)
+				total = await clan.calculateTopExpDaily(clanName, numTop);
+			else {
+				combat = await clan.calculateTopExpDaily(clanName, numTop, "combat");
+				skilling = await clan.calculateTopExpDaily(clanName, numTop, "skilling");
+			}
+			break;
 		case 'weekly':
-		announcement = "This week's " + announcement;
-		res = await clan.calculateTopExpWeekly(clanName, numTop);
-		break;
+			announcement = "This week's " + announcement;
+			if(!isSplit)
+				total = await clan.calculateTopExpWeekly(clanName, numTop);
+			else {
+				combat = await clan.calculateTopExpWeekly(clanName, numTop, "combat");
+				skilling = await clan.calculateTopExpWeekly(clanName, numTop, "skilling");
+			}
+			break;
 		case 'monthly':
-		announcement = "This month's " + announcement;
-		res = await clan.calculateTopExpMonthly(clanName, numTop);
-		break;
+			announcement = "This month's " + announcement;
+			if(!isSplit)
+				total = await clan.calculateTopExpMonthly(clanName, numTop);
+			else {
+				combat = await clan.calculateTopExpMonthly(clanName, numTop, "combat");
+				skilling = await clan.calculateTopExpMonthly(clanName, numTop, "skilling");
+			}
+			break;
 	}
-	for(var i = 0; i < numTop; i++) {
-		if(typeof res[i].name != 'undefined')
-			announcement += `\n${i+1}) ${res[i].name} at ${res[i].exp.toLocaleString()}` + " exp.";
+	if(!isSplit) {
+		for(var i = 0; i < numTop; i++) {
+			if(typeof total[i].name != 'undefined')
+				announcement += `\n${i+1}) ${total[i].name} at ${total[i].exp.toLocaleString()}` + " exp.";
+		}
+	}
+	else {
+		announcement += "\n***COMBAT***"
+		for(var i = 0; i < numTop; i++) {
+			if(typeof combat[i].name != 'undefined')
+				announcement += `\n${i+1}) ${combat[i].name} at ${combat[i].exp.toLocaleString()}` + " exp.";
+		}
+		announcement += "\n***SKILLING***"
+		for(var i = 0; i < numTop; i++) {
+			if(typeof skilling[i].name != 'undefined')
+				announcement += `\n${i+1}) ${skilling[i].name} at ${skilling[i].exp.toLocaleString()}` + " exp.";
+		}
 	}
 	hook.send("```\n" + announcement + "\n```"); // have the hook send the announcement
 }
@@ -252,6 +281,8 @@ client.on('message', msg => {
 		} else {
 			msg.reply('Please provide the username you wish to check.');
 		}
+	} else if (command.toUpperCase() === '!weeklysplit'.toUpperCase()) {
+		makeExpAnnouncement('Sorrow Knights', 5, 'weekly', true);
 	}
   }
 });

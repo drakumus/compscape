@@ -212,17 +212,26 @@ async function getUserTable(name) {
  * @param {String} timeSlot time table you wish to reference: daily, weekly, monthly
  * @param {number} numTop between 1 and # members in the clan
  */
-async function calculateTopExp(clan, timeSlot, numTop) {
+async function calculateTopExp(clan, timeSlot, numTop, catagory = "all") {
     // find and store the difference between the timed table and the current exp table
     var current_data = await db.getClanData(clan);
     var timed_data = await db.getClanData(clan, timeSlot);
     var memberTotals = {}; // where the fuck did the rest go?
     for(var i in timed_data) {
-        var name = timed_data[i].name
-        var currentTotal = calculateTotalExp(current_data[i]);
-        var timedTotal = calculateTotalExp(timed_data[i]);
+        var name = timed_data[i].name;
+        var currentTotal, timedTotal;
+        if(catagory === "all") {
+            currentTotal = calculateTotalExp(current_data[i])
+            timedTotal = calculateTotalExp(timed_data[i]);
+        } else if (catagory === "combat") {
+            currentTotal = calculateCombatExp(current_data[i])
+            timedTotal = calculateCombatExp(timed_data[i]);
+        } else if (catagory === "skilling") {
+            currentTotal = calculateSkillingExp(current_data[i])
+            timedTotal = calculateSkillingExp(timed_data[i]);
+        }
         var total = currentTotal - timedTotal;
-        if(total > 0 && timedTotal > 0) memberTotals[name] = total; 
+        if(total > 0 && timedTotal > 0) memberTotals[name] = total;
     }
 
     // sort the list until the top x players have been found
@@ -287,20 +296,20 @@ async function getUserRank(user, clan, catagory = "all", timeSlot) {
 }
 
 // uses the calculate top method with the daily table
-async function calculateTopExpDaily(clan, numTop) {
-    const result = await calculateTopExp(clan, 'daily', numTop);
+async function calculateTopExpDaily(clan, numTop, type = "all") {
+    const result = await calculateTopExp(clan, 'daily', numTop, type);
     return result;
 }
 
 // uses the calculate top method with the weekly table
-async function calculateTopExpWeekly(clan, numTop) {
-    const result = await calculateTopExp(clan, 'weekly', numTop);
+async function calculateTopExpWeekly(clan, numTop, type = "all") {
+    const result = await calculateTopExp(clan, 'weekly', numTop, type);
     return result;
 }
 
 // uses the calculate top method with the monthly table
-async function calculateTopExpMonthly(clan, numTop) {
-    const result = await calculateTopExp(clan, 'monthly', numTop);
+async function calculateTopExpMonthly(clan, numTop, type = "all") {
+    const result = await calculateTopExp(clan, 'monthly', numTop, type);
     return result;
 }
 
