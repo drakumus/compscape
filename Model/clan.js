@@ -106,7 +106,7 @@ async function addNewMembers(clan) {
 
     if(newMembers.length > 0) {
         await db.addUsers(newMembers, clan);
-        await db.addExpUsers(newMembers, clan);
+        await db.addExpUsers(newMembers);
     }
 }
 
