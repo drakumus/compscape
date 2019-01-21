@@ -52,6 +52,16 @@ async function makeExpAnnouncement(clanName = 'Sorrow Knights', numTop = 5, time
 				skilling = await clan.calculateTopExpMonthly(clanName, numTop, "skilling");
 			}
 			break;
+		case 'event':
+			announcement = "This event's " + announcement;
+			if(!isSplit)
+				total = await clan.calculateTopExpEvent(clanName, numTop);
+			else {
+				combat = await clan.calculateTopExpEvent(clanName, numTop, "combat");
+				skilling = await clan.calculateTopExpEvent(clanName, numTop, "skilling");
+			}
+			break;
+
 	}
 	if(!isSplit) {
 		for(var i = 0; i < numTop; i++) {
@@ -261,14 +271,14 @@ client.on('message', msg => {
 				if(i != args.length-1) name += " ";
 			}
 
-			clan.getUserRank(name, `Sorrow Knights`, `combat`, `weekly`).then(res => {
+			clan.getUserRank(name, `Sorrow Knights`, `combat`, `event`).then(res => {
 				if(Object.keys(res).length > 0) {
 					msg.channel.send("**COMBAT:** Rank " + res.rank + " at " + res.exp.toLocaleString() + " exp.");
 				} else {
 					msg.channel.send("No combat exp gained.");
 				}
 			}).then( res => {
-				clan.getUserRank(name, 'Sorrow Knights', 'skilling', 'weekly').then(res => {
+				clan.getUserRank(name, 'Sorrow Knights', 'skilling', 'event').then(res => {
 					if(Object.keys(res).length > 0) {
 						msg.channel.send("**SKILLING:** Rank " + res.rank + " at " + res.exp.toLocaleString() + " exp.");
 					} else {
@@ -281,8 +291,8 @@ client.on('message', msg => {
 		} else {
 			msg.reply('Please provide the username you wish to check.');
 		}
-	} else if (command.toUpperCase() === '!weeklysplit'.toUpperCase()) {
-		makeExpAnnouncement('Sorrow Knights', 5, 'weekly', true);
+	} else if (command.toUpperCase() === '!leaderboard'.toUpperCase()) {
+		makeExpAnnouncement('Sorrow Knights', 5, 'event', true);
 	}
   }
 });

@@ -107,8 +107,13 @@ async function addNewMembers(clan) {
     if(newMembers.length > 0) {
         await db.addUsers(newMembers, clan);
         await db.addExpUsers(newMembers);
+        await db.addExpUsers(newMembers, 'daily');
+        await db.addExpUsers(newMembers, 'weekly');
+        await db.addExpUsers(newMembers, 'monthly');
     }
 }
+
+//addNewMembers("Sorrow Knights")
 
 // TODO: Create function to remove members that are no longer in a specified clan in the table
 
@@ -313,6 +318,12 @@ async function calculateTopExpMonthly(clan, numTop, type = "all") {
     return result;
 }
 
+// uses the calculate top method with the event table
+async function calculateTopExpEvent(clan, numTop, type = "all") {
+    const result = await calculateTopExp(clan, 'event', numTop, type);
+    return result;
+}
+
 /**
  * Adds new members and updates experience in the experience table for existing members
  * @param {String} clan clan to update
@@ -336,6 +347,10 @@ async function setMonthlyXp() {
     await db.duplicateTable('monthly');
 }
 
+async function setEventXp() {
+    await db.duplicateTable('event');
+}
+
 //setDailyXP('Sorrow Knights');
 //calculateTopExp('Sorrow Knights');
 //setMonthlyXp('Sorrow Knights');
@@ -357,11 +372,13 @@ module.exports = {
     setDailyXP,
     setWeeklyXp,
     setMonthlyXp,
+    setEventXp,
     calculateTopExpDaily,
     calculateTopExpWeekly,
     calculateTopExpMonthly,
+    calculateTopExpEvent,
     getUserTable,
     getClanUserData,
     getClanExp,
-    getUserRank
+    getUserRank,
 }
