@@ -114,7 +114,6 @@ async function addNewMembers(clan) {
 }
 
 //addNewMembers("Sorrow Knights")
-
 // TODO: Create function to remove members that are no longer in a specified clan in the table
 
 /**
@@ -219,7 +218,9 @@ async function getUserTable(name) {
  */
 async function calculateTopExp(clan, timeSlot, numTop, catagory = "all") {
     // find and store the difference between the timed table and the current exp table
-    var current_data = await db.getClanData(clan);
+    var current_data = timeSlot === "event" ? 
+    await  db.getClanData(clan, "even_end"):
+    await db.getClanData(clan);
     var timed_data = await db.getClanData(clan, timeSlot);
     var memberTotals = {}; // where the fuck did the rest go?
     for(var i in timed_data) {
@@ -255,7 +256,9 @@ async function calculateTopExp(clan, timeSlot, numTop, catagory = "all") {
 
 async function getUserRank(user, clan, catagory = "all", timeSlot) {
     await db.updateExpUser(user);
-    var current_data = await db.getClanData(clan);
+    var current_data = timeSlot === "event" ? 
+                        await  db.getClanData(clan, "even_end"):
+                        await db.getClanData(clan);
     var timed_data = await db.getClanData(clan, timeSlot);
     var memberTotals = {};
 
