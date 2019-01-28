@@ -30,7 +30,7 @@ const skill_id_lookup = {
 	25:	"Divination",
 	26:	"Invention"
 };
-const runemetric_endpoint = "https://apps.runescape.com/runemetrics/profile/profile?user=";
+const runemetric_endpoint = "https://apps.runescape.com/runemetrics/profile/profile?activities=12&user=";
 const hiscore_endpoint = "https://secure.runescape.com/m=hiscore/index_lite.ws?player=";
 const exp_cap = 13034431;
 const elite_exp_cap = 36073511;
@@ -84,6 +84,7 @@ async function listSkills(user) {
 
 	return skills;
 }
+
 
 /**
  * Calculates experience remianing for a player to max in runescape 3
@@ -148,6 +149,12 @@ async function calcCombatLevel(user) {
 	return result;
 }
 
+async function getALog(user) {
+	let data = await getUserData(user);
+	let raw = data.activities;
+	return raw;
+}
+
 module.exports = {
 	calcExpToMax,
 	listSkills,
@@ -155,5 +162,6 @@ module.exports = {
 	calcCombatLevel,
 	canTheyJoinTheClan,
 	getHiscoreTable,
-	getHiscoreData
+	getHiscoreData,
+	getALog
 }

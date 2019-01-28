@@ -293,6 +293,31 @@ client.on('message', msg => {
 		}
 	} else if (command.toUpperCase() === '!leaderboard'.toUpperCase()) {
 		makeExpAnnouncement('Sorrow Knights', 5, 'event', true);
+	} else if (command.toUpperCase() === '!log'.toUpperCase()) {
+		if(args.length >= 2) {
+			var name = "";
+			for(var i = 1; i < args.length; i++) {
+				name += args[i];
+				if(i != args.length-1) name += " ";
+			}
+
+			max.getALog(name).then(res => {
+				var image_url = `http://secure.runescape.com/m=avatar-rs/${name}/chat.png`;
+				let embed = new Discord.RichEmbed()
+				.setTitle(`${name}'s Adventure Log`)
+				.setThumbnail(image_url)
+				.setColor(0xe500ff);
+
+				for (var i in res) {
+					let val = res[i];
+					embed.addField(val.date, val.details, false);
+				}
+
+				msg.channel.send({embed});
+			}).catch(err => {
+				msg.channel.send("User's profile is either private or username is invalid.")
+			});
+		}
 	}
   }
 });
