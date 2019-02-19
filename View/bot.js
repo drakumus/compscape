@@ -3,6 +3,7 @@ const max = require('../Model/max.js');
 const db = require('../Model/database.js');
 var clan = require('../Model/clan.js');
 var schedule = require('node-schedule');
+var scraper = require('../Model/scraper')
 var table = require('table').table;
 var fs = require('fs');
 
@@ -119,6 +120,12 @@ var monthly_job = schedule.scheduleJob('0 0 1 * *', function(){
 	});
 	// send stuff to discord channel
 });
+
+var prif_job = schedule.scheduleJob('0 * * * *', function(){
+	scraper.getHour().then(res => {
+		console.log("The Voice of Seren is now active in " + res);
+	})
+})
 
 client.on('ready', () => {
   console.log(`${client.user.tag} is up and running!`);
