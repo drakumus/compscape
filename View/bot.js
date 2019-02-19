@@ -123,7 +123,7 @@ var monthly_job = schedule.scheduleJob('0 0 1 * *', function(){
 
 var prif_job = schedule.scheduleJob('0 * * * *', function(){
 	scraper.getHour().then(res => {
-		console.log("The Voice of Seren is now active in " + res);
+		hook.send("The Voice of Seren is now active in " + res);
 	})
 })
 
