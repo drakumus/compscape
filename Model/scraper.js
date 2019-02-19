@@ -12,3 +12,6 @@ async function getHour() {
     return matches[0];
 }
 
+module.exports = {
+    getHour
+}
