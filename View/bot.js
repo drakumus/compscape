@@ -121,7 +121,7 @@ var monthly_job = schedule.scheduleJob('0 0 1 * *', function(){
 	// send stuff to discord channel
 });
 
-var prif_job = schedule.scheduleJob('0 * * * *', function(){
+var prif_job = schedule.scheduleJob('1 * * * *', function(){
 	scraper.getHour().then(res => {
 		hook.send("The Voice of Seren is now active in " + res);
 	})
