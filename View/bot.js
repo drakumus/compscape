@@ -127,6 +127,22 @@ var prif_job = schedule.scheduleJob('1 * * * *', function(){
 	})
 })
 
+async function getName(args, id) {
+	var name = null;
+	if(args.length >= 2) {
+		// concatenate the username args
+		name = "";
+		for(var i = 1; i < args.length; i++) {
+			name += args[i];
+			if(i != args.length-1) name += " ";
+		}
+	} else {
+		name = await clan.getUserRSN(id)
+	}
+
+	return name;
+}
+
 client.on('ready', () => {
   console.log(`${client.user.tag} is up and running!`);
 });
@@ -155,178 +171,176 @@ client.on('message', msg => {
 		} else {
 			msg.reply('Please provide the username you wish to check.');
 		}
-    } else if(command === '!daily') {
-		// gives the current top X players for the daily time table
-		clanChannel = msg.channel;
-		makeExpAnnouncement('Sorrow Knights', 5, 'daily');
-	} else if(command === '!weekly') {
-		// gives the current top X players for the weekly time table
-		clanChannel = msg.channel;
-		makeExpAnnouncement('Sorrow Knights', 5, 'weekly');
-	} else if(command === '!monthly') {
-		// gives the current top X players for the monthly time table
-		clanChannel = msg.channel;
-		makeExpAnnouncement('Sorrow Knights', 5, 'monthly');
-	} else if(command === '!exp' || command === '!Exp') {
-		if(args.length >= 2) {
-			// concatenate the username args
-			var name = "";
-			for(var i = 1; i < args.length; i++) {
-				name += args[i];
-				if(i != args.length-1) name += " ";
-			}
-			clan.getUserTable(name).then(res => {
-				var config = {
-					drawHorizontalLine: (index, size) => {
-						return index === 0 || index === 1 || index === size;
-					},
-					columns: {
-						0: {
-							alignment: 'left',
-							minWidth: 5
-						},
-						1: {
-							alignment: 'right',
-							minWidth: 5
-						},
-						2: {
-							alignment: 'right',
-							minWidth: 5
-						},
-						3: {
-							alignment: 'right',
-							minWidth: 5
-						}
-					}
-				};
-				var t = table(res, config);
-				msg.channel.send('```\n'+ t + '\n```');
-			}).catch( rej => {
-				msg.channel.send('Invalid username.');
-			});
-		} else {
-			msg.reply('Please provide the username you wish to check.');
-		}
-	} else if(command === "!canjoin") {
-		// concatenate the username args
-		if(args.length >= 2) {
-			// concatenate the username args
-			var name = "";
-			for(var i = 1; i < args.length; i++) {
-				name += args[i];
-				if(i != args.length-1) name += " ";
-			}
-			max.canTheyJoinTheClan(name).then(res => {
-				if(res) {
-					msg.channel.send(name + " is eligible to join the clan!");
-				} else {
-					msg.channel.send("Unfortunately, " + name + " does not meet the minimum requirements to join the clan.");
-				}
-				max.getHiscoreTable(name).then(res => {
-					var config = {
-						drawHorizontalLine: (index, size) => {
-							return index === 0 || index === 1 || index === size;
-						},
-						columns: {
-							0: {
-								alignment: 'left',
-								minWidth: 5
+		} else if(command === '!daily') {
+			// gives the current top X players for the daily time table
+			clanChannel = msg.channel;
+			makeExpAnnouncement('Sorrow Knights', 5, 'daily');
+		} else if(command === '!weekly') {
+			// gives the current top X players for the weekly time table
+			clanChannel = msg.channel;
+			makeExpAnnouncement('Sorrow Knights', 5, 'weekly');
+		} else if(command === '!monthly') {
+			// gives the current top X players for the monthly time table
+			clanChannel = msg.channel;
+			makeExpAnnouncement('Sorrow Knights', 5, 'monthly');
+		} else if(command === '!exp' || command === '!Exp') {
+			getName(args, msg.member.user.id).then(name => {
+				if(name != null) {
+					clan.getUserTable(name).then(res => {
+						var config = {
+							drawHorizontalLine: (index, size) => {
+								return index === 0 || index === 1 || index === size;
 							},
-							1: {
-								alignment: 'right',
-								minWidth: 5
-							},
-							2: {
-								alignment: 'right',
-								minWidth: 5
+							columns: {
+								0: {
+									alignment: 'left',
+									minWidth: 5
+								},
+								1: {
+									alignment: 'right',
+									minWidth: 5
+								},
+								2: {
+									alignment: 'right',
+									minWidth: 5
+								},
+								3: {
+									alignment: 'right',
+									minWidth: 5
+								}
 							}
-						}
-					};
-					var t = table(res, config);
-					msg.channel.send('```\n' + t + '\n```');
-				})
-			})//.catch( rej => {
-			//	console.log(rej);
-			//	msg.channel.send('Invalid username.');
-			//});
-		} else {
-			msg.reply('Please provide the username you wish to check.');
-		}
-	} else if (command.toUpperCase() === '!clanexp'.toUpperCase()) {
-		if(args.length >= 2) {
-			var name = "";
-			for(var i = 1; i < args.length; i++) {
-				name += args[i];
-				if(i != args.length-1) name += " ";
-			}
-
-			clan.getClanExp(name).then(res => {
-				if(res.length > 0) {
-					msg.channel.send(name+" has gained a total of " + parseInt(res, 10).toLocaleString() + " exp since joining the clan.");
-				}
-			}).catch(err => {
-				msg.channel.send("Failed to find user data. Are they in the clan?")
-			});
-		} else {
-			msg.reply('Please provide the username you wish to check.');
-		}
-	} else if (command.toUpperCase() === '!rank'.toUpperCase()) {
-		if(args.length >= 2) {
-			var name = "";
-			for(var i = 1; i < args.length; i++) {
-				name += args[i];
-				if(i != args.length-1) name += " ";
-			}
-
-			clan.getUserRank(name, `Sorrow Knights`, `combat`, `event`).then(res => {
-				if(Object.keys(res).length > 0) {
-					msg.channel.send("**COMBAT:** Rank " + res.rank + " at " + res.exp.toLocaleString() + " exp.");
+						};
+						var t = table(res, config);
+						msg.channel.send('```\n'+ t + '\n```');
+					}).catch( rej => {
+						msg.channel.send('Invalid username.');
+					});
 				} else {
-					msg.channel.send("No combat exp gained.");
+					msg.reply('Please provide the username you wish to check.');
 				}
-			}).then( res => {
-				clan.getUserRank(name, 'Sorrow Knights', 'skilling', 'event').then(res => {
-					if(Object.keys(res).length > 0) {
-						msg.channel.send("**SKILLING:** Rank " + res.rank + " at " + res.exp.toLocaleString() + " exp.");
+			});
+		} else if(command === "!canjoin") {
+			// concatenate the username args
+			if(args.length >= 2) {
+				// concatenate the username args
+				var name = "";
+				for(var i = 1; i < args.length; i++) {
+					name += args[i];
+					if(i != args.length-1) name += " ";
+				}
+				max.canTheyJoinTheClan(name).then(res => {
+					if(res) {
+						msg.channel.send(name + " is eligible to join the clan!");
 					} else {
-						msg.channel.send("No skilling exp gained.");
+						msg.channel.send("Unfortunately, " + name + " does not meet the minimum requirements to join the clan.");
 					}
-				})
-			}).catch(err => {
-				msg.channel.send("Failed to find user data. Or no exp gained.")
-			});
-		} else {
-			msg.reply('Please provide the username you wish to check.');
-		}
-	} else if (command.toUpperCase() === '!leaderboard'.toUpperCase()) {
-		makeExpAnnouncement('Sorrow Knights', 5, 'event', true);
-	} else if (command.toUpperCase() === '!log'.toUpperCase()) {
-		if(args.length >= 2) {
-			var name = "";
-			for(var i = 1; i < args.length; i++) {
-				name += args[i];
-				if(i != args.length-1) name += " ";
+					max.getHiscoreTable(name).then(res => {
+						var config = {
+							drawHorizontalLine: (index, size) => {
+								return index === 0 || index === 1 || index === size;
+							},
+							columns: {
+								0: {
+									alignment: 'left',
+									minWidth: 5
+								},
+								1: {
+									alignment: 'right',
+									minWidth: 5
+								},
+								2: {
+									alignment: 'right',
+									minWidth: 5
+								}
+							}
+						};
+						var t = table(res, config);
+						msg.channel.send('```\n' + t + '\n```');
+					})
+				})//.catch( rej => {
+				//	console.log(rej);
+				//	msg.channel.send('Invalid username.');
+				//});
+			} else {
+				msg.reply('Please provide the username you wish to check.');
 			}
-
-			max.getALog(name).then(res => {
-				var image_url = `http://secure.runescape.com/m=avatar-rs/${name}/chat.png`;
-				let embed = new Discord.RichEmbed()
-				.setTitle(`${name}'s Adventure Log`)
-				.setThumbnail(image_url)
-				.setColor(0xe500ff);
-
-				for (var i in res) {
-					let val = res[i];
-					embed.addField(val.date, val.details, false);
+		} else if (command.toUpperCase() === '!clanexp'.toUpperCase()) {
+			getName(args, msg.member.user.id).then(name => {
+				if(name != null) {
+					clan.getClanExp(name).then(res => {
+						if(res.length > 0) {
+							msg.channel.send(name+" has gained a total of " + parseInt(res, 10).toLocaleString() + " exp since joining the clan.");
+						}
+					}).catch(err => {
+						msg.channel.send("Failed to find user data. Are they in the clan?")
+					});
+				} else {
+					msg.reply('Please provide the username you wish to check.');
 				}
-
-				msg.channel.send({embed});
-			}).catch(err => {
-				msg.channel.send("User's profile is either private or username is invalid.")
+			}); 
+		} else if (command.toUpperCase() === '!rank'.toUpperCase()) {
+			getName(args, msg.member.user.id).then(name => {
+				if(name != null) {
+					clan.getUserRank(name, `Sorrow Knights`, `combat`, `event`).then(res => {
+						if(Object.keys(res).length > 0) {
+							msg.channel.send("**COMBAT:** Rank " + res.rank + " at " + res.exp.toLocaleString() + " exp.");
+						} else {
+							msg.channel.send("No combat exp gained.");
+						}
+					}).then( res => {
+						clan.getUserRank(name, 'Sorrow Knights', 'skilling', 'event').then(res => {
+							if(Object.keys(res).length > 0) {
+								msg.channel.send("**SKILLING:** Rank " + res.rank + " at " + res.exp.toLocaleString() + " exp.");
+							} else {
+								msg.channel.send("No skilling exp gained.");
+							}
+						})
+					}).catch(err => {
+						msg.channel.send("Failed to find user data. Or no exp gained.")
+					});
+				} else {
+					msg.reply('Please provide the username you wish to check.');
+				}
+			});
+		} else if (command.toUpperCase() === '!leaderboard'.toUpperCase()) {
+			makeExpAnnouncement('Sorrow Knights', 5, 'event', true);
+		} else if (command.toUpperCase() === '!log'.toUpperCase()) {
+			getName(args, msg.member.user.id).then(name => {
+				if(name != null) {
+					max.getALog(name).then(res => {
+						var image_url = `http://secure.runescape.com/m=avatar-rs/${name}/chat.png`;
+						let embed = new Discord.RichEmbed()
+						.setTitle(`${name}'s Adventure Log`)
+						.setThumbnail(image_url)
+						.setColor(0xe500ff);
+	
+						for (var i in res) {
+							let val = res[i];
+							embed.addField(val.date, val.details, false);
+						}
+	
+						msg.channel.send({embed});
+					}).catch(err => {
+						msg.channel.send("User's profile is either private or username is invalid.")
+					});
+				} else {
+					msg.reply('Please provide the username you wish to check.');
+				}
+			});
+		} else if (command.toUpperCase() === '!myRSN'.toUpperCase()) {
+			getName(args, msg.member.user.id).then(name => {
+				if(name != null) {
+					clan.setUserRSN(msg.member.user.id, name).then(res => {
+						msg.channel.send("Your RSN is now set to " + name + ". You can now use commands such as !exp without specifying a name.")
+					}).catch(err => {
+						msg.channel.send("Failed to set runescape name. Ping Z0CI to get it fixed")
+					});
+				} else {
+					msg.reply('Please provide the username you wish to check.');
+				}
 			});
 		}
-	}
-  }
+	} 
 });
 
 client.login(secret.token);

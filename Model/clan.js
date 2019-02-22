@@ -165,6 +165,24 @@ function calculateSkillingExp(rowdata) {
     return total;
 }
 
+async function getUserRSN(id) {
+    let raw = await db.getDiscordUser(id);
+    if(raw != null && raw.length > 0) {
+        let result = raw[0]
+        return result.rsn;
+    }
+    return null;
+}
+
+async function setUserRSN(id, rsn) {
+    let current_rsn = await getUserRSN(id);
+    if(current_rsn == null) {
+        db.addDiscordUser(id, rsn);
+    } else {
+        db.updateDiscordUser(id, rsn);
+    }
+}
+
 function difSkills(skillData1, skillData2) {
     var result = {}
     for(var skill in skillData1) {
@@ -384,4 +402,6 @@ module.exports = {
     getClanUserData,
     getClanExp,
     getUserRank,
+    getUserRSN,
+    setUserRSN
 }

@@ -64,6 +64,36 @@ async function close_connection() {
     }
 }
 
+async function getDiscordUser(discord_id) {
+    isCon = await init_connection();
+    if(!isCon) return null;
+
+    const raw = await query_db(`SELECT * FROM \`discord_user\` WHERE id = ${discord_id}`);
+    close_connection();
+    
+    return raw;
+}
+
+async function addDiscordUser(id, rsn) {
+    isCon = await init_connection();
+    if(!isCon) return null;
+
+    const raw = await query_db(`INSERT INTO \`discord_user\` (\`id\`, \`rsn\`) VALUES ('${id}', '${rsn}')`)
+    close_connection();
+
+    return raw;
+}
+
+async function updateDiscordUser(id, rsn) {
+    isCon = await init_connection();
+    if(!isCon) return null;
+
+    const raw = await query_db(`UPDATE \`discord_user\` SET \`rsn\` = '${rsn}' WHERE \`discord_user\`.\`id\` = ${id}`);
+    close_connection();
+
+    return raw;
+}
+
 // get data for a specific clan by doing a left join on the user table to one of the experience tables (experience, daily, weekly, monthly)
 async function getClanData(clan, table = 'experience') {
     isCon = await init_connection();
@@ -435,7 +465,7 @@ async function testRemoveUsers() {
 
 async function testCode(){
     
-    var result = await extractSkillDataTable('Boomshot2k7');
+    var result = await getDiscordUser('135244717901348864');
     console.log(result);
     //var result = await testAddUsers(['Z0CI', 'Wet Tofu'], 'Sorrow Knights');//await updateExpUsers(['Z0CI','10redturtle','Evil Fax', 'Sockobird']);
     //console.log(result);
@@ -446,7 +476,7 @@ async function testCode(){
 //updateUser('Z0CI');
 //updateUser('Boomshot2k7');
 //removeUser('Boomshot2k7');
-//testCode();S
+//testCode();
 
 module.exports = {
     addUser,
@@ -460,5 +490,8 @@ module.exports = {
     duplicateTable,
     getClanData,
     getUserData,
-    extractSkillDataTable
+    extractSkillDataTable,
+    getDiscordUser,
+    updateDiscordUser,
+    addDiscordUser
 }
