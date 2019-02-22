@@ -365,11 +365,45 @@ client.on('message', msg => {
 						hook.send(`<@${msg.member.user.id}> one of your ships has arrived!`)
 					})
 
-					msg.channel.send("Timer successfully set to go off in " + hours + " hours and " + minutes + " minutes.")
+					msg.channel.send("Timer successfully set to go off in " + hours + " hour(s) and " + minutes + " minute(s).")
 				} catch (ex) {
 					msg.channel.send("Invalid time/date please enter the time you see on your ports timer");
 				}
-				
+			} else {
+				msg.channel.send("Missing time argument");
+			}
+		} else if (command.toUpperCase() === '!startEvent'.toUpperCase() && msg.member.user.id === "135244717901348864") {
+			if(args.length > 1) {
+				var timer = "";
+				for(var i = 1; i < args.length; i++) {
+					timer += args[i];
+					if(i != args.length-1) name += " ";
+				}
+				try{
+					const minute_reg = /(?<=:)[0-9]*/
+					const hour_reg = /[0-9]*(?=:)/
+					let minutes = timer.match(minute_reg)[0];
+					let hours = timer.match(hour_reg)[0];
+					if(minutes[0] === '0' && minutes.length > 1) {
+						minutes = minutes.substring(1,minutes.length);
+					}
+					if(hours[0] === '0' && hours.length > 1) {
+						hours = hours.substring(1,minutes.length);
+					}
+					let time = new Date();
+					time.setHours(time.getHours()+ parseInt(hours));
+					time.setMinutes(time.getMinutes()+parseInt(minutes));
+
+					schedule.scheduleJob(time, function(){
+						clan.setEventXp().then(()=>{
+							hook.send(`Double exp has begun! You can now track your exp gains throughout the weekend and compare with your clannies using the commands \`!rank\` and \`!leaderboard\`. Happy Gains!`);
+						});
+					})
+
+					msg.channel.send("The exp table tracking double exp will reset in " + hours + " hour(s) and " + minutes + " minute(s).")
+				} catch (ex) {
+					msg.channel.send("Invalid time/date please enter the time you see on your ports timer");
+				}
 			} else {
 				msg.channel.send("Missing time argument");
 			}

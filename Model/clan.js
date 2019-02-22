@@ -274,8 +274,8 @@ async function calculateTopExp(clan, timeSlot, numTop, catagory = "all") {
 
 async function getUserRank(user, clan, catagory = "all", timeSlot) {
     await db.updateExpUser(user);
-    var current_data = timeSlot === "event" ? 
-                        await  db.getClanData(clan, "even_end"):
+    var current_data = //timeSlot === "event" ? 
+                        //await  db.getClanData(clan, "even_end"):
                         await db.getClanData(clan);
     var timed_data = await db.getClanData(clan, timeSlot);
     var memberTotals = {};
