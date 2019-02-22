@@ -364,7 +364,9 @@ client.on('message', msg => {
 					schedule.scheduleJob(time, function(){
 						hook.send(`<@${msg.member.user.id}> one of your ships has arrived!`)
 					})
-				} catch {
+
+					msg.channel.send("Timer successfully set to go off in " + hours + " hours and " + minutes + " minutes.")
+				} catch (ex) {
 					msg.channel.send("Invalid time/date please enter the time you see on your ports timer");
 				}
 				
