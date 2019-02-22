@@ -339,6 +339,38 @@ client.on('message', msg => {
 					msg.reply('Please provide the username you wish to check.');
 				}
 			});
+		} else if (command.toUpperCase() === '!ports'.toUpperCase()) {
+			if(args.length > 1) {
+				var timer = "";
+				for(var i = 1; i < args.length; i++) {
+					timer += args[i];
+					if(i != args.length-1) name += " ";
+				}
+				try{
+					const minute_reg = /(?<=:)[0-9]*/
+					const hour_reg = /[0-9]*(?=:)/
+					let minutes = timer.match(minute_reg)[0];
+					let hours = timer.match(hour_reg)[0];
+					if(minutes[0] === '0' && minutes.length > 1) {
+						minutes = minutes.substring(1,minutes.length);
+					}
+					if(hours[0] === '0' && hours.length > 1) {
+						hours = hours.substring(1,minutes.length);
+					}
+					let time = new Date();
+					time.setHours(time.getHours()+ parseInt(hours));
+					time.setMinutes(time.getMinutes()+parseInt(minutes));
+
+					schedule.scheduleJob(time, function(){
+						hook.send(`<@${msg.member.user.id}> one of your ships has arrived!`)
+					})
+				} catch {
+					msg.channel.send("Invalid time/date please enter the time you see on your ports timer");
+				}
+				
+			} else {
+				msg.channel.send("Missing time argument");
+			}
 		}
 	} 
 });
