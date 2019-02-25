@@ -372,6 +372,10 @@ async function setEventXp() {
     await db.duplicateTable('event');
 }
 
+async function setEventEndXp() {
+    await db.duplicateTable('end');
+}
+
 //setDailyXP('Sorrow Knights');
 //calculateTopExp('Sorrow Knights');
 //setMonthlyXp('Sorrow Knights');
@@ -394,6 +398,7 @@ module.exports = {
     setWeeklyXp,
     setMonthlyXp,
     setEventXp,
+    setEventEndXp,
     calculateTopExpDaily,
     calculateTopExpWeekly,
     calculateTopExpMonthly,
