@@ -1,5 +1,5 @@
 var rp = require('request-promise');
-
+var request = require('request');
 // conversion table for the skill ids provided by the runemetric endpoint to readable skill names
 const skill_id_lookup = {
 	0:	"Attack",
@@ -46,6 +46,13 @@ async function getUserData(user) {
 	};
 	let res = await rp(options);
 	return res;
+}
+
+async function getUserPNG(user) {
+	var r = request(`http://secure.runescape.com/m=avatar-rs/${user}/chat.png`, (e, response) => {
+	});
+
+	return r;
 }
 
 async function getHiscoreData(user) {
@@ -155,6 +162,11 @@ async function getALog(user) {
 	return raw;
 }
 
+async function test(){
+	var data = await getUserData('Jac Farsight')
+	console.log(data);
+}
+
 module.exports = {
 	calcExpToMax,
 	listSkills,
@@ -163,5 +175,6 @@ module.exports = {
 	canTheyJoinTheClan,
 	getHiscoreTable,
 	getHiscoreData,
-	getALog
+	getALog,
+	getUserPNG
 }

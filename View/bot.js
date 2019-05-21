@@ -326,19 +326,21 @@ client.on('message', msg => {
 		} else if (command.toUpperCase() === '!log'.toUpperCase()) {
 			getName(args, msg.member.user.id).then(name => {
 				if(name != null) {
+					console.log(name);
 					max.getALog(name).then(res => {
-						var image_url = `http://secure.runescape.com/m=avatar-rs/${name}/chat.png`;
-						let embed = new Discord.RichEmbed()
-						.setTitle(`${name}'s Adventure Log`)
-						.setThumbnail(image_url)
-						.setColor(0xe500ff);
-	
-						for (var i in res) {
-							let val = res[i];
-							embed.addField(val.date, val.details, false);
-						}
-	
-						msg.channel.send({embed});
+						
+						max.getUserPNG(name).then((image_url)=>{
+							let embed = new Discord.RichEmbed()
+							.setTitle(`${name.toLocaleString()}'s Adventure Log`)
+							.setThumbnail(image_url.uri.href)
+							.setColor(0xe500ff);
+		
+							for (var i in res) {
+								let val = res[i];
+								embed.addField(val.date, val.details, false);
+							}
+							msg.channel.send({embed});
+						});
 					}).catch(err => {
 						msg.channel.send("User's profile is either private or username is invalid.")
 					});
