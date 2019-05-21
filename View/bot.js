@@ -12,8 +12,8 @@ var fs = require('fs');
 // To push updates to a discord channel you need to use a webhook.
 // Hence the use of one here to push daily, weekly, and monthly updates
 const secret = JSON.parse(fs.readFileSync("./View/secret.json", { encoding: 'utf8' }));
-const hook = new Discord.WebhookClient(secret.hook_id,secret.hook_token);
-
+const spam_hook = new Discord.WebhookClient(secret.spam_hook_id,secret.spam_hook_token);
+const ach_hook = new Discord.WebhookClient(secret.ach_hook_id, secret.ach_hook_token);
 const client = new Discord.Client();
 
 function checkForInjection(message) {
@@ -82,12 +82,31 @@ async function makeExpAnnouncement(clanName = 'Sorrow Knights', numTop = 5, time
 				announcement += `\n${i+1}) ${skilling[i].name} at ${skilling[i].exp.toLocaleString()}` + " exp.";
 		}
 	}
-	hook.send("```\n" + announcement + "\n```"); // have the hook send the announcement
+	spam_hook.send("```\n" + announcement + "\n```"); // have the hook send the announcement
 }
 
 // every hour on the 30min mark
-var daily_update = schedule.scheduleJob('30 * * * *', function(){
-	clan.updateClan('Sorrow Knights');
+var hourly_update = schedule.scheduleJob('30 * * * *', function(){
+	new Promise(() => {
+		clan.updateClan('Sorrow Knights').then((new99sAnd120s) =>{
+			var new99s = ""
+			var new120s = ""
+			for(name in new99sAnd120s){
+				for(let skill in new99sAnd120s[name]['99s']){
+					new99s += `\n${new99sAnd120s[name]['99s'][skill]}`
+				}
+				for(let skill in new99sAnd120s[name]['120s']){
+					new120s += `\n${new99sAnd120s[name]['99s'][skill]}`
+				}
+				if(new99s.length > 0) {
+					ach_hook.send(`${name} has achieved level 99 in:`+new99s)
+				}
+				if(new120s.length > 0) {
+					ach_hook.send(`${name} has achieved level 120 in:`+new120s)
+				}
+			}
+		})
+	});
 })
 
 // at 0 gmt
@@ -123,7 +142,7 @@ var monthly_job = schedule.scheduleJob('0 0 1 * *', function(){
 
 var prif_job = schedule.scheduleJob('1 * * * *', function(){
 	scraper.getHour().then(res => {
-		hook.send("The Voice of Seren is now active in " + res);
+		spam_hook.send("The Voice of Seren is now active in " + res);
 	})
 })
 
@@ -362,7 +381,7 @@ client.on('message', msg => {
 					time.setMinutes(time.getMinutes()+parseInt(minutes));
 
 					schedule.scheduleJob(time, function(){
-						hook.send(`<@${msg.member.user.id}> one of your ships has arrived!`)
+						spam_hook.send(`<@${msg.member.user.id}> one of your ships has arrived!`)
 					})
 
 					msg.channel.send("Timer successfully set to go off in " + hours + " hour(s) and " + minutes + " minute(s).")
@@ -396,7 +415,7 @@ client.on('message', msg => {
 
 					schedule.scheduleJob(time, function(){
 						clan.setEventXp().then(()=>{
-							hook.send(`Double exp has begun! You can now track your exp gains throughout the weekend and compare with your clannies using the commands \`!rank\` and \`!leaderboard\`. Happy Gains!`);
+							spam_hook.send(`Double exp has begun! You can now track your exp gains throughout the weekend and compare with your clannies using the commands \`!rank\` and \`!leaderboard\`. Happy Gains!`);
 						});
 					})
 
@@ -431,7 +450,7 @@ client.on('message', msg => {
 
 					schedule.scheduleJob(time, function(){
 						clan.setEventEndXp().then(()=>{
-							hook.send(`Double exp is over! The final exp totals have been saved and the final leaderboard will be updated in a bit. For now it will keep updating with current xp while dev sleeps.`);
+							spam_hook.send(`Double exp is over! The final exp totals have been saved and the final leaderboard will be updated in a bit. For now it will keep updating with current xp while dev sleeps.`);
 						});
 					})
 

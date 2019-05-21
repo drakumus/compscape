@@ -8,6 +8,8 @@ var connection; // global to keep track of connection to mysql db
 var isCon = false; // helpful global to see if the connection object was able to be set properly
 var stackCount = 0; // frame counter that keeps track of number connections attempted.
 
+var foreverPromise;
+
 // I'll talk about the next 3 methods in a group here since this solution took me a few hours of muddling to figure out
 // First the problem:
 // How do I avoid opening and closing a connection everytime I want to query the db.
@@ -304,13 +306,43 @@ async function addExpUsers(names, table = 'experience') {
 // Update the exp for a single user.
 // Potential useful for users that want hourly tracking on skills and potential
 // services built around that. Runemetric endpoing updates amazingly fast, even faster than the actual runemetric site.
+function check99andEqual(old_skill_exp, new_skill_exp){
+    let new99s = [];
+    let new120s = [];
+    let level99Exp = 13034431;
+    let level120Exp = 104273167;
+    let isDif = false;
+    for(let skill in new_skill_exp) {
+        old_exp = old_skill_exp[skill.toLowerCase()];
+        new_exp = Math.round(new_skill_exp[skill])
+        if(old_exp != new_exp){
+            isDif = true;
+            if(old_exp < level99Exp && new_exp >= level99Exp)
+                new99s.push(skill);
+            if(old_exp < level120Exp && new_exp >= level120Exp)
+                new120s.push(skill);
+        }
+    }
+    if (isDif)
+        return {"99s": new99s, "120s": new120s};
+    else
+        return null;
+}
+
 async function updateExpUser(name, table = 'experience') {
     isCon = await init_connection();
     if(!isCon) return null;
 
     var skillData = await extractSkillData(name);
     var user_id = await getIdUser(name);
+    var user_skills = await extractSkillDataTable(name, 'experience');
     if(skillData["Ranged"] != null) {   // when I first wrote this I did skillData == {} which obviously passes. Forgot that === was a thing
+        newAchieves = check99andEqual();
+        if(newAchieves == null) {
+            close_connection();
+            return user_skills;
+        }
+        
         var sql = `UPDATE \`${table}\` SET \`attack\` = '${skillData["Attack"]}', \`defence\` = '${skillData["Defence"]}', \`strength\` = '${skillData["Strength"]}', \`constitution\` = '${skillData["Constitution"]}', \`ranged\` = '${skillData["Ranged"]}', \`prayer\` = '${skillData["Prayer"]}', \`magic\` = '${skillData["Magic"]}', \`cooking\` = '${skillData["Cooking"]}', \`woodcutting\` = '${skillData["Woodcutting"]}', \`fletching\` = '${skillData["Fletching"]}', \`fishing\` = '${skillData["Fishing"]}', \`firemaking\` = '${skillData["Firemaking"]}', \`crafting\` = '${skillData["Crafting"]}', \`smithing\` = '${skillData["Smithing"]}', \`mining\` = '${skillData["Mining"]}', \`herblore\` = '${skillData["Herblore"]}', \`agility\` = '${skillData["Agility"]}', \`thieving\` = '${skillData["Thieving"]}', \`slayer\` = '${skillData["Slayer"]}', \`farming\` = '${skillData["Farming"]}', \`runecrafting\` = '${skillData["Runecrafting"]}', \`hunter\` = '${skillData["Hunter"]}', \`construction\` = '${skillData["Construction"]}', \`summoning\` = '${skillData["Summoning"]}', \`dungeoneering\` = '${skillData["Dungeoneering"]}', \`divination\` = '${skillData["Divination"]}', \`invention\` = '${skillData["Invention"]}' WHERE \`experience\`.\`user_id\` = '${user_id}'`;
         const result = await query_db(sql);
         close_connection();
@@ -328,17 +360,22 @@ async function updateExpUsers(names, table = 'experience') {
     if(!isCon) return null;
 
     var ids = await getIdUsers(names);
-    var result = []
+    var result = {};
     for(var name in ids) {
+        if(name == 'Z0CI')
+        {
+            console.log("hello sexy");
+        }
         var user_id = ids[name];
         var skillData = await extractSkillData(name);
-        if(user_id === 1446) {
-            console.log(skillData["Woodcutting"]);
-        }
+        var user_skills = await extractSkillDataTable(name, 'experience');
         if(skillData["Ranged"] != null) {
-
-            const output = await query_db(`UPDATE \`${table}\` SET \`attack\` = '${skillData["Attack"]}', \`defence\` = '${skillData["Defence"]}', \`strength\` = '${skillData["Strength"]}', \`constitution\` = '${skillData["Constitution"]}', \`ranged\` = '${skillData["Ranged"]}', \`prayer\` = '${skillData["Prayer"]}', \`magic\` = '${skillData["Magic"]}', \`cooking\` = '${skillData["Cooking"]}', \`woodcutting\` = '${skillData["Woodcutting"]}', \`fletching\` = '${skillData["Fletching"]}', \`fishing\` = '${skillData["Fishing"]}', \`firemaking\` = '${skillData["Firemaking"]}', \`crafting\` = '${skillData["Crafting"]}', \`smithing\` = '${skillData["Smithing"]}', \`mining\` = '${skillData["Mining"]}', \`herblore\` = '${skillData["Herblore"]}', \`agility\` = '${skillData["Agility"]}', \`thieving\` = '${skillData["Thieving"]}', \`slayer\` = '${skillData["Slayer"]}', \`farming\` = '${skillData["Farming"]}', \`runecrafting\` = '${skillData["Runecrafting"]}', \`hunter\` = '${skillData["Hunter"]}', \`construction\` = '${skillData["Construction"]}', \`summoning\` = '${skillData["Summoning"]}', \`dungeoneering\` = '${skillData["Dungeoneering"]}', \`divination\` = '${skillData["Divination"]}', \`invention\` = '${skillData["Invention"]}' WHERE \`experience\`.\`user_id\` = '${user_id}'; `);
-            result.push(output);
+            newAchieves = check99andEqual(user_skills, skillData);
+            if(newAchieves != null) {
+                const output = await query_db(`UPDATE \`${table}\` SET \`attack\` = '${skillData["Attack"]}', \`defence\` = '${skillData["Defence"]}', \`strength\` = '${skillData["Strength"]}', \`constitution\` = '${skillData["Constitution"]}', \`ranged\` = '${skillData["Ranged"]}', \`prayer\` = '${skillData["Prayer"]}', \`magic\` = '${skillData["Magic"]}', \`cooking\` = '${skillData["Cooking"]}', \`woodcutting\` = '${skillData["Woodcutting"]}', \`fletching\` = '${skillData["Fletching"]}', \`fishing\` = '${skillData["Fishing"]}', \`firemaking\` = '${skillData["Firemaking"]}', \`crafting\` = '${skillData["Crafting"]}', \`smithing\` = '${skillData["Smithing"]}', \`mining\` = '${skillData["Mining"]}', \`herblore\` = '${skillData["Herblore"]}', \`agility\` = '${skillData["Agility"]}', \`thieving\` = '${skillData["Thieving"]}', \`slayer\` = '${skillData["Slayer"]}', \`farming\` = '${skillData["Farming"]}', \`runecrafting\` = '${skillData["Runecrafting"]}', \`hunter\` = '${skillData["Hunter"]}', \`construction\` = '${skillData["Construction"]}', \`summoning\` = '${skillData["Summoning"]}', \`dungeoneering\` = '${skillData["Dungeoneering"]}', \`divination\` = '${skillData["Divination"]}', \`invention\` = '${skillData["Invention"]}' WHERE \`experience\`.\`user_id\` = '${user_id}'; `);
+                if(newAchieves["99s"].length != 0 || newAchieves["120s"].length != 0)
+                    result[name] = newAchieves;
+            }
         }
     }
     close_connection();
@@ -493,5 +530,6 @@ module.exports = {
     extractSkillDataTable,
     getDiscordUser,
     updateDiscordUser,
-    addDiscordUser
+    addDiscordUser,
+    foreverPromise
 }

@@ -352,7 +352,8 @@ async function calculateTopExpEvent(clan, numTop, type = "all") {
 async function updateClan(clan) {
     var members = await getClanMembers(clan);
     await addNewMembers(clan);
-    await db.updateExpUsers(members);
+    var new99sAnd120s = await db.updateExpUsers(members);
+    return new99sAnd120s;
 }
 
 // makes copies of the experience table at a given job time for daily, weekly, and monthly
