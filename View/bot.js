@@ -6,6 +6,8 @@ var schedule = require('node-schedule');
 var scraper = require('../Model/scraper')
 var table = require('table').table;
 var fs = require('fs');
+const resources = JSON.parse(fs.readFileSync("./View/resources.json", {encoding: 'utf8'}));
+
 
 // a quick discussion on webhooks and how they're used with discord:
 // It is not possible for a bot to do anything but respond to events in discord.
@@ -85,24 +87,26 @@ async function makeExpAnnouncement(clanName = 'Sorrow Knights', numTop = 5, time
 	spam_hook.send("```\n" + announcement + "\n```"); // have the hook send the announcement
 }
 
+function makeSkillAchievementAnnouncement(skill, name, level) {
+	let embed = new Discord.RichEmbed()
+							.setTitle(`${name.toLocaleString()} has achieved level ${level} in ${skill.toLowerCase()}!`)
+							.setThumbnail(resources.skillingIcons[skill.toLowerCase()])
+							.setColor(level > 99 ? 0xffe900 : 0x00AE86);
+	//console.log(embed)
+	ach_hook.send(embed)
+}
+
+
 // every hour on the 30min mark
 var hourly_update = schedule.scheduleJob('30 * * * *', function(){
 	new Promise(() => {
 		clan.updateClan('Sorrow Knights').then((new99sAnd120s) =>{
-			var new99s = ""
-			var new120s = ""
 			for(name in new99sAnd120s){
 				for(let skill in new99sAnd120s[name]['99s']){
-					new99s += `\n${new99sAnd120s[name]['99s'][skill]}`
+					makeSkillAchievementAnnouncement(skill, name, 99);
 				}
 				for(let skill in new99sAnd120s[name]['120s']){
-					new120s += `\n${new99sAnd120s[name]['99s'][skill]}`
-				}
-				if(new99s.length > 0) {
-					ach_hook.send(`${name} has achieved level 99 in:`+new99s)
-				}
-				if(new120s.length > 0) {
-					ach_hook.send(`${name} has achieved level 120 in:`+new120s)
+					makeSkillAchievementAnnouncement(skill, name, 120);
 				}
 			}
 		})
@@ -468,5 +472,7 @@ client.on('message', msg => {
 });
 
 client.login(secret.token);
+
+makeSkillAchievementAnnouncement('Mining', 'Boomshot2k7', 99);
 //makeExpAnnouncement('Sorrow Knights', 5, 'daily');
 //makeExpAnnouncement('Sorrow Knights', 5, 'monthly');

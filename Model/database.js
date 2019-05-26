@@ -76,6 +76,22 @@ async function getDiscordUser(discord_id) {
     return raw;
 }
 
+async function getUserNames() {
+    isCon = await init_connection();
+    if(!isCon) return null;
+
+    const raw = await query_db(`SELECT \`name\` FROM \`user\``)
+    close_connection();
+
+    let names = []
+
+    for(var i in raw) {
+        names.push(raw[i].name);
+    }
+
+    return names;
+}
+
 async function addDiscordUser(id, rsn) {
     isCon = await init_connection();
     if(!isCon) return null;
@@ -502,11 +518,15 @@ async function testRemoveUsers() {
 
 async function testCode(){
     
-    var result = await getDiscordUser('135244717901348864');
-    console.log(result);
+    var result = await getUserNames();
+    for(i in result) {
+        console.log(result[i]);
+    }
     //var result = await testAddUsers(['Z0CI', 'Wet Tofu'], 'Sorrow Knights');//await updateExpUsers(['Z0CI','10redturtle','Evil Fax', 'Sockobird']);
     //console.log(result);
 }
+
+//testCode();
 
 //addUsers(['Weezy Weez','10redturtle','Aminishit']);
 //testUpdateExpUser();
@@ -516,6 +536,7 @@ async function testCode(){
 //testCode();
 
 module.exports = {
+    getUserNames,
     addUser,
     addUsers,
 	addExpUser,

@@ -163,8 +163,15 @@ async function getALog(user) {
 }
 
 async function test(){
-	var data = await getUserData('Jac Farsight')
+	var data = await getALog('iSlash')
 	console.log(data);
+	/*
+	Object {
+		date: "16-May-2019 20:59",
+		details: "I killed 3 Telos, the final defenders of the Heart of Gielinor.",
+		text: "I killed 3 Telos."
+	}
+	*/
 }
 
 module.exports = {

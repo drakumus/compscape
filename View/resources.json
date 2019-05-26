@@ -1,0 +1,32 @@
+{
+    "skillingIcons": {
+        "attack": "https://runescape.wiki/images/thumb/5/51/Attack-icon.png/21px-Attack-icon.png",
+        "strength": "https://runescape.wiki/images/thumb/3/3e/Strength-icon.png/16px-Strength-icon.png",
+        "defenseI": "https://runescape.wiki/images/thumb/d/d8/Defence-icon.png/18px-Defence-icon.png",
+        "ranged": "https://runescape.wiki/images/thumb/7/72/Ranged-icon.png/21px-Ranged-icon.png",
+        "prayer": "https://runescape.wiki/images/2/24/Prayer-icon.png",
+        "magic": "https://runescape.wiki/images/thumb/7/77/Magic-icon.png/21px-Magic-icon.png",
+        "constitution": "https://runescape.wiki/images/thumb/1/1d/Constitution-icon.png/21px-Constitution-icon.png",
+        "crafting": "https://runescape.wiki/images/thumb/4/48/Crafting-icon.png/21px-Crafting-icon.png",
+        "mining": "https://runescape.wiki/images/thumb/2/28/Mining-icon.png/21px-Mining-icon.png",
+        "smithing": "https://runescape.wiki/images/thumb/d/df/Smithing-icon.png/21px-Smithing-icon.png",
+        "fishing": "https://runescape.wiki/images/thumb/0/0b/Fishing-icon.png/21px-Fishing-icon.png",
+        "cooking": "https://runescape.wiki/images/thumb/f/f7/Cooking-icon.png/17px-Cooking-icon.png",
+        "firemaking": "https://runescape.wiki/images/thumb/6/6d/Firemaking-icon.png/18px-Firemaking-icon.png",
+        "woodcutting": "https://runescape.wiki/images/thumb/0/0f/Woodcutting-icon.png/18px-Woodcutting-icon.png",
+        "runecrafting": "https://runescape.wiki/images/thumb/6/64/Runecrafting-icon.png/20px-Runecrafting-icon.png",
+        "dungeoneering": "https://runescape.wiki/images/thumb/3/3e/Dungeoneering-icon.png/21px-Dungeoneering-icon.png",
+        "fletching": "https://runescape.wiki/images/thumb/7/77/Fletching-icon.png/21px-Fletching-icon.png",
+        "agility": "https://runescape.wiki/images/thumb/8/84/Agility-icon.png/18px-Agility-icon.png",
+        "herblore": "https://runescape.wiki/images/thumb/f/f1/Herblore-icon.png/21px-Herblore-icon.png",
+        "thieving": "https://runescape.wiki/images/thumb/f/f3/Thieving-icon.png/21px-Thieving-icon.png",
+        "slayer": "https://runescape.wiki/images/thumb/c/cf/Slayer-icon.png/20px-Slayer-icon.png",
+        "farming": "https://runescape.wiki/images/thumb/f/f0/Farming-icon.png/21px-Farming-icon.png",
+        "construction": "https://runescape.wiki/images/thumb/e/e5/Construction-icon.png/21px-Construction-icon.png",
+        "hunter": "https://runescape.wiki/images/thumb/8/83/Hunter-icon.png/21px-Hunter-icon.png",
+        "summoning": "https://runescape.wiki/images/thumb/e/e3/Summoning-icon.png/19px-Summoning-icon.png",
+        "divination": "https://runescape.wiki/images/thumb/c/c3/Divination-icon.png/21px-Divination-icon.png",
+        "invention": "https://runescape.wiki/images/thumb/1/1f/Invention-icon.png/17px-Invention-icon.png"
+    
+    }
+}
