@@ -9,7 +9,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}\\Model\\database.js"
+            "program": "${workspaceFolder}\\View\\bot.js"
         }
     ]
 }

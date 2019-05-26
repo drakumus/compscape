@@ -103,10 +103,12 @@ var hourly_update = schedule.scheduleJob('30 * * * *', function(){
 		clan.updateClan('Sorrow Knights').then((new99sAnd120s) =>{
 			for(name in new99sAnd120s){
 				for(let skill in new99sAnd120s[name]['99s']){
-					makeSkillAchievementAnnouncement(skill, name, 99);
+					let skillName = new99sAnd120s[name]['99s'][skill];
+					makeSkillAchievementAnnouncement(skillName, name, 99);
 				}
 				for(let skill in new99sAnd120s[name]['120s']){
-					makeSkillAchievementAnnouncement(skill, name, 120);
+					let skillName = new99sAnd120s[name]['99s'][skill];
+					makeSkillAchievementAnnouncement(skillName, name, 120);
 				}
 			}
 		})
@@ -473,4 +475,5 @@ client.on('message', msg => {
 
 client.login(secret.token);
 
+// makeSkillAchievementAnnouncement('Slayer','FallenWolves','99')
 //makeExpAnnouncement('Sorrow Knights', 5, 'monthly');

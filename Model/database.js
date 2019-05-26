@@ -133,6 +133,14 @@ async function getUserData(name, table = 'experience') {
     return raw;
 }
 
+async function getUserAllUserData(table = 'experience') {
+    isCon = await init_connection();
+    if(!isCon) return null;
+
+    const raw = await query_db(`SELECT * FROM user LEFT JOIN ${table} ON user.id = ${table}.user_id WHERE name = '${name}'`);
+    close_connection();
+}
+
 // this extrapolates the raw skill data of atk, str, and so on from a client query to runescape's runemetric lite endpoint.
 async function extractSkillData(name) { 
     var raw = await max.listSkills(name).catch(function (rej) {
@@ -552,5 +560,6 @@ module.exports = {
     getDiscordUser,
     updateDiscordUser,
     addDiscordUser,
-    foreverPromise
+    foreverPromise,
+    getUserAllUserData
 }
