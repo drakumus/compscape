@@ -473,6 +473,4 @@ client.on('message', msg => {
 
 client.login(secret.token);
 
-makeSkillAchievementAnnouncement('Mining', 'Boomshot2k7', 99);
-//makeExpAnnouncement('Sorrow Knights', 5, 'daily');
 //makeExpAnnouncement('Sorrow Knights', 5, 'monthly');
