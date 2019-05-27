@@ -95,6 +95,22 @@ async function addClan(clan) {
     await db.addExpUsers(members);
 }
 
+async function matchName(newMemberName, currentUserData) {
+    // get the given new members alog
+    // do you get the drop in your alog if u're group bossing?
+    
+    // check the current member's alog
+
+    // if they have 2 matching day time events they must be the same
+    // change the current member's name to that of the new member
+
+    //    - start logging people's adventure logs
+    //      - run a script that logs everyone in the clan's log
+    //      - date time | name | log title | text | details
+    //      - continue to log from the most recent date time in db
+
+}
+
 /**
  * Adds members that don't already exist in the db that are in the specified clan to the db
  * @param {String} clan clan name
@@ -104,7 +120,17 @@ async function addNewMembers(clan) {
     var dbMembers = await db.getClanMembers(clan);
     var newMembers = members.filter(val => !dbMembers.includes(val));
 
+
+
     if(newMembers.length > 0) {
+        // for future use
+        //let clan_data = await db.getAllUserData();
+        /*
+        for(let index in newMembers) {
+            matchName(newMembers[index]);
+        }
+        */
+
         await db.addUsers(newMembers, clan);
         await db.addExpUsers(newMembers);
         await db.addExpUsers(newMembers, 'daily');
@@ -112,6 +138,8 @@ async function addNewMembers(clan) {
         await db.addExpUsers(newMembers, 'monthly');
     }
 }
+
+
 
 //addNewMembers("Sorrow Knights")
 // TODO: Create function to remove members that are no longer in a specified clan in the table

@@ -8,7 +8,6 @@ var connection; // global to keep track of connection to mysql db
 var isCon = false; // helpful global to see if the connection object was able to be set properly
 var stackCount = 0; // frame counter that keeps track of number connections attempted.
 
-var foreverPromise;
 
 // I'll talk about the next 3 methods in a group here since this solution took me a few hours of muddling to figure out
 // First the problem:
@@ -133,7 +132,7 @@ async function getUserData(name, table = 'experience') {
     return raw;
 }
 
-async function getUserAllUserData(table = 'experience') {
+async function getAllUserData(table = 'experience') {
     isCon = await init_connection();
     if(!isCon) return null;
 
@@ -556,10 +555,9 @@ module.exports = {
     duplicateTable,
     getClanData,
     getUserData,
+    getAllUserData,
     extractSkillDataTable,
     getDiscordUser,
     updateDiscordUser,
-    addDiscordUser,
-    foreverPromise,
-    getUserAllUserData
+    addDiscordUser
 }

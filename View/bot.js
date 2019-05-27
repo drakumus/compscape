@@ -343,7 +343,7 @@ client.on('message', msg => {
 		
 							for (var i in res) {
 								let val = res[i];
-								embed.addField(val.date, val.details, false);
+								embed.addField(val.text, `[${val.date}] ${val.details}`, false);
 							}
 							msg.channel.send({embed});
 						});
