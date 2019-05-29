@@ -84,7 +84,7 @@ async function makeExpAnnouncement(clanName = 'Sorrow Knights', numTop = 5, time
 				announcement += `\n${i+1}) ${skilling[i].name} at ${skilling[i].exp.toLocaleString()}` + " exp.";
 		}
 	}
-	spam_hook.send("```\n" + announcement + "\n```"); // have the hook send the announcement
+	ach_hook.send("```\n" + announcement + "\n```"); // have the hook send the announcement
 }
 
 function makeSkillAchievementAnnouncement(skill, name, level) {
@@ -343,7 +343,7 @@ client.on('message', msg => {
 		
 							for (var i in res) {
 								let val = res[i];
-								embed.addField(val.text, `[${val.date}] ${val.details}`, false);
+								embed.addField(val.date, val.details, false);
 							}
 							msg.channel.send({embed});
 						});
