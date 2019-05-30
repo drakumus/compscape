@@ -220,8 +220,11 @@ function difSkills(skillData1, skillData2) {
     return result;
 }
 
-async function getUserTable(name) {
-    await db.updateExpUser(name, 'experience');
+async function getUserTable(name, ach_callback) {
+    let userAch = await db.updateExpUser(name, 'experience');
+    if(userAch != null) {
+        ach_callback(name, userAch);
+    }
     var currentExp = await db.extractSkillDataTable(name, 'experience');
     var dailyExp = await db.extractSkillDataTable(name, 'daily');
     var weeklyExp = await db.extractSkillDataTable(name, 'weekly');
@@ -301,7 +304,7 @@ async function calculateTopExp(clan, timeSlot, numTop, catagory = "all") {
 }
 
 async function getUserRank(user, clan, catagory = "all", timeSlot) {
-    await db.updateExpUser(user);
+    //await db.updateExpUser(user);
     var current_data = timeSlot === "event" ? 
                         await  db.getClanData(clan, "end"):
                         await db.getClanData(clan);

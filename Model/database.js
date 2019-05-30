@@ -360,16 +360,16 @@ async function updateExpUser(name, table = 'experience') {
     var user_id = await getIdUser(name);
     var user_skills = await extractSkillDataTable(name, 'experience');
     if(skillData["Ranged"] != null) {   // when I first wrote this I did skillData == {} which obviously passes. Forgot that === was a thing
-        newAchieves = check99andEqual();
+        newAchieves = check99andEqual(user_skills, skillData);
         if(newAchieves == null) {
             close_connection();
-            return user_skills;
+            return null;
         }
         
         var sql = `UPDATE \`${table}\` SET \`attack\` = '${skillData["Attack"]}', \`defence\` = '${skillData["Defence"]}', \`strength\` = '${skillData["Strength"]}', \`constitution\` = '${skillData["Constitution"]}', \`ranged\` = '${skillData["Ranged"]}', \`prayer\` = '${skillData["Prayer"]}', \`magic\` = '${skillData["Magic"]}', \`cooking\` = '${skillData["Cooking"]}', \`woodcutting\` = '${skillData["Woodcutting"]}', \`fletching\` = '${skillData["Fletching"]}', \`fishing\` = '${skillData["Fishing"]}', \`firemaking\` = '${skillData["Firemaking"]}', \`crafting\` = '${skillData["Crafting"]}', \`smithing\` = '${skillData["Smithing"]}', \`mining\` = '${skillData["Mining"]}', \`herblore\` = '${skillData["Herblore"]}', \`agility\` = '${skillData["Agility"]}', \`thieving\` = '${skillData["Thieving"]}', \`slayer\` = '${skillData["Slayer"]}', \`farming\` = '${skillData["Farming"]}', \`runecrafting\` = '${skillData["Runecrafting"]}', \`hunter\` = '${skillData["Hunter"]}', \`construction\` = '${skillData["Construction"]}', \`summoning\` = '${skillData["Summoning"]}', \`dungeoneering\` = '${skillData["Dungeoneering"]}', \`divination\` = '${skillData["Divination"]}', \`invention\` = '${skillData["Invention"]}' WHERE \`experience\`.\`user_id\` = '${user_id}'`;
         const result = await query_db(sql);
         close_connection();
-        return result;
+        return newAchieves;
     } else {
         close_connection();
         return false;

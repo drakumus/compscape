@@ -96,20 +96,24 @@ function makeSkillAchievementAnnouncement(skill, name, level) {
 	ach_hook.send(embed)
 }
 
+function makeUserSkillAchievementAnnouncement(name, new99sAnd120s) {
+	for(let skill in new99sAnd120s['99s']){
+		let skillName = new99sAnd120s['99s'][skill];
+		makeSkillAchievementAnnouncement(skillName, name, 99);
+	}
+	for(let skill in new99sAnd120s['120s']){
+		let skillName = new99sAnd120s['99s'][skill];
+		makeSkillAchievementAnnouncement(skillName, name, 120);
+	}
+}
 
 // every hour on the 30min mark
 var hourly_update = schedule.scheduleJob('30 * * * *', function(){
 	new Promise(() => {
 		clan.updateClan('Sorrow Knights').then((new99sAnd120s) =>{
 			for(name in new99sAnd120s){
-				for(let skill in new99sAnd120s[name]['99s']){
-					let skillName = new99sAnd120s[name]['99s'][skill];
-					makeSkillAchievementAnnouncement(skillName, name, 99);
-				}
-				for(let skill in new99sAnd120s[name]['120s']){
-					let skillName = new99sAnd120s[name]['99s'][skill];
-					makeSkillAchievementAnnouncement(skillName, name, 120);
-				}
+				
+				makeUserSkillAchievementAnnouncement(name, new99sAnd120s[name]);
 			}
 		})
 	});
@@ -211,7 +215,7 @@ client.on('message', msg => {
 		} else if(command === '!exp' || command === '!Exp') {
 			getName(args, msg.member.user.id).then(name => {
 				if(name != null) {
-					clan.getUserTable(name).then(res => {
+					clan.getUserTable(name, makeUserSkillAchievementAnnouncement).then(res => {
 						var config = {
 							drawHorizontalLine: (index, size) => {
 								return index === 0 || index === 1 || index === size;
@@ -237,9 +241,9 @@ client.on('message', msg => {
 						};
 						var t = table(res, config);
 						msg.channel.send('```\n'+ t + '\n```');
-					}).catch( rej => {
-						msg.channel.send('Invalid username.');
-					});
+					})//.catch( rej => {
+						//msg.channel.send('Invalid username.');
+					//});
 				} else {
 					msg.reply('Please provide the username you wish to check.');
 				}
@@ -282,10 +286,10 @@ client.on('message', msg => {
 						var t = table(res, config);
 						msg.channel.send('```\n' + t + '\n```');
 					})
-				})//.catch( rej => {
-				//	console.log(rej);
-				//	msg.channel.send('Invalid username.');
-				//});
+				}).catch( rej => {
+					console.log(rej);
+					msg.channel.send('Invalid username.');
+				});
 			} else {
 				msg.reply('Please provide the username you wish to check.');
 			}
