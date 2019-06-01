@@ -380,7 +380,7 @@ async function calculateTopExpEvent(clan, numTop, type = "all") {
  * Adds new members and updates experience in the experience table for existing members
  * @param {String} clan clan to update
  */
-async function updateClan(clan) {
+async function updateClan(clan = 'Sorrow Knights') {
     var members = await getClanMembers(clan);
     await addNewMembers(clan);
     var new99sAnd120s = await db.updateExpUsers(members);

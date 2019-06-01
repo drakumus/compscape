@@ -332,10 +332,16 @@ async function addExpUsers(names, table = 'experience') {
 function check99andEqual(old_skill_exp, new_skill_exp){
     let new99s = [];
     let new120s = [];
+    let level120inv = 80618654;
+    let level99inv = 36073511;
     let level99Exp = 13034431;
     let level120Exp = 104273167;
     let isDif = false;
     for(let skill in new_skill_exp) {
+        if (skill.toLowerCase() == "invention") {
+            level120Exp = level120inv;
+            level99Exp = level99inv;
+        }
         old_exp = old_skill_exp[skill.toLowerCase()];
         new_exp = Math.round(new_skill_exp[skill])
         if(old_exp != new_exp){
@@ -385,12 +391,9 @@ async function updateExpUsers(names, table = 'experience') {
     var ids = await getIdUsers(names);
     var result = {};
     for(var name in ids) {
-        if(name == 'Z0CI')
-        {
-            console.log("hello sexy");
-        }
         var user_id = ids[name];
         var skillData = await extractSkillData(name);
+        console.log(skillData);
         var user_skills = await extractSkillDataTable(name, 'experience');
         if(skillData["Ranged"] != null) {
             newAchieves = check99andEqual(user_skills, skillData);
