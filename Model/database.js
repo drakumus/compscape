@@ -332,25 +332,36 @@ async function addExpUsers(names, table = 'experience') {
 function check99andEqual(old_skill_exp, new_skill_exp){
     let new99s = [];
     let new120s = [];
-    let level120inv = 80618654;
-    let level99inv = 36073511;
-    let level99Exp = 13034431;
-    let level120Exp = 104273167;
+    const LVL_99_INV_EXP = 36073511;
+    const LVL_120_INV_EXP = 80618654;
+    const LVL_99_EXP = 13034431;
+    const LVL_120_EXP = 104273167;
     let isDif = false;
+    let level99threshold = LVL_99_EXP;
+    let level120threshold = LVL_120_EXP;
+    // loop over each skill and compare their old and new exp
     for(let skill in new_skill_exp) {
+        // set exp threshold if invention or not.
         if (skill.toLowerCase() == "invention") {
-            level120Exp = level120inv;
-            level99Exp = level99inv;
+            level99threshold = LVL_99_INV_EXP;
+            level120threshold = LVL_120_INV_EXP;
+        } else {
+            level99threshold = LVL_99_EXP;
+            level120threshold = LVL_120_EXP;
         }
+        // new_exp has data after the decimal so round that off
         old_exp = old_skill_exp[skill.toLowerCase()];
         new_exp = Math.round(new_skill_exp[skill])
+        // check if they're equal. If they break the 99 or 120 threshold
+        // log them.
         if(old_exp != new_exp){
             isDif = true;
-            if(old_exp < level99Exp && new_exp >= level99Exp)
+            if(old_exp < level99threshold && new_exp >= level99threshold)
                 new99s.push(skill);
-            if(old_exp < level120Exp && new_exp >= level120Exp)
+            if(old_exp < level120threshold && new_exp >= level120threshold)
                 new120s.push(skill);
         }
+
     }
     if (isDif)
         return {"99s": new99s, "120s": new120s};
