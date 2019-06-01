@@ -102,7 +102,7 @@ function makeUserSkillAchievementAnnouncement(name, new99sAnd120s) {
 		makeSkillAchievementAnnouncement(skillName, name, 99);
 	}
 	for(let skill in new99sAnd120s['120s']){
-		let skillName = new99sAnd120s['99s'][skill];
+		let skillName = new99sAnd120s['120s'][skill];
 		makeSkillAchievementAnnouncement(skillName, name, 120);
 	}
 }
