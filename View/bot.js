@@ -182,24 +182,14 @@ client.on('message', msg => {
     var command = args[0];
 	if(checkForInjection(msg.content)) { // have to sanitize my inputs
 		msg.reply("Fuck you.");			 // wouldn't want an injection attack now would we :)
-	} else if(command === '!max') {
-		// check to make sure a username was provided
-		if(args.length >= 2) {
-			// concatenate the username args
-			var name = "";
-			for(var i = 1; i < args.length; i++) {
-				name += args[i];
-				if(i != args.length-1) name += " ";
-			}
-				// get the character data from runemetric api endpoint and calc exp to max.
+	} else if(command === '!max'){
+			getName(args, msg.member.user.id).then(name => {
 				max.calcExpToMax(name).then(function(exp) {
 					msg.channel.send(name + ' has ' + exp.toLocaleString() + ' exp left to max.');
 				}).catch( rej => {
 					msg.channel.send('Invalid username.');
 				});
-		} else {
-			msg.reply('Please provide the username you wish to check.');
-		}
+			});
 		} else if(command === '!daily') {
 			// gives the current top X players for the daily time table
 			clanChannel = msg.channel;
@@ -241,9 +231,9 @@ client.on('message', msg => {
 						};
 						var t = table(res, config);
 						msg.channel.send('```\n'+ t + '\n```');
-					})//.catch( rej => {
-						//msg.channel.send('Invalid username.');
-					//});
+					}).catch( rej => {
+						msg.channel.send('Invalid username.');
+					});
 				} else {
 					msg.reply('Please provide the username you wish to check.');
 				}

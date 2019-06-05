@@ -1,5 +1,6 @@
 var rp = require('request-promise');
 var request = require('request');
+var db = require('./database.js')
 // conversion table for the skill ids provided by the runemetric endpoint to readable skill names
 const skill_id_lookup = {
 	0:	"Attack",
