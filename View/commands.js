@@ -75,7 +75,7 @@ async function handleCanJoin(name) {
             "**total level:** " + result.total;
         } else {
             text = "Unfortunately, " + name + " does not meet the minimum requirements to join the clan.\n" +
-            "**combat:** " + result.combat.toFixed(2) + "\n" + 
+            "**combat:**      " + result.combat.toFixed(2) + "\n" + 
             "**total level:** " + result.total;
         }
         let res = await max.getHiscoreTable(name);

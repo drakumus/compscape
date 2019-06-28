@@ -1,5 +1,6 @@
 const max = require('../Model/max.js');
 var clan = require('../Model/clan.js');
+const Discord = require('discord.js');
 
 // make an announcement for a given time table
 async function makeExpAnnouncementMessage(clanName = 'Sorrow Knights', numTop = 5, time = 'daily', isSplit = false) {
