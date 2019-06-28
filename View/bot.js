@@ -7,7 +7,6 @@ var table = require('table').table;
 var commands = require('./commands.js');
 var annmsg = require('./announcementmsg.js');
 var fs = require('fs');
-const resources = JSON.parse(fs.readFileSync("./View/resources.json", {encoding: 'utf8'}));
 
 
 // a quick discussion on webhooks and how they're used with discord:

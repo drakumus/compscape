@@ -1,6 +1,8 @@
 const max = require('../Model/max.js');
 var clan = require('../Model/clan.js');
 const Discord = require('discord.js');
+const fs = require('fs');
+const resources = JSON.parse(fs.readFileSync("./View/resources.json", {encoding: 'utf8'}));
 
 // make an announcement for a given time table
 async function makeExpAnnouncementMessage(clanName = 'Sorrow Knights', numTop = 5, time = 'daily', isSplit = false) {
