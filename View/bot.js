@@ -1,10 +1,11 @@
 const Discord = require('discord.js');
 const max = require('../Model/max.js');
-const db = require('../Model/database.js');
 var clan = require('../Model/clan.js');
 var schedule = require('node-schedule');
-var scraper = require('../Model/scraper')
+var scraper = require('../Model/scraper');
 var table = require('table').table;
+var commands = require('./commands.js');
+var annmsg = require('./announcementmsg.js');
 var fs = require('fs');
 const resources = JSON.parse(fs.readFileSync("./View/resources.json", {encoding: 'utf8'}));
 
@@ -24,91 +25,27 @@ function checkForInjection(message) {
 
 // make an announcement for a given time table
 async function makeExpAnnouncement(clanName = 'Sorrow Knights', numTop = 5, time = 'daily', isSplit = false, isSpam = true) {
-	var announcement = `top gains are:`;
-	//await clan.updateClan('Sorrow Knights');
-	var total, combat, skilling;
-	switch(time) {
-		case 'daily':
-			announcement = "Today's " + announcement;
-			if(!isSplit)
-				total = await clan.calculateTopExpDaily(clanName, numTop);
-			else {
-				combat = await clan.calculateTopExpDaily(clanName, numTop, "combat");
-				skilling = await clan.calculateTopExpDaily(clanName, numTop, "skilling");
-			}
-			break;
-		case 'weekly':
-			announcement = "This week's " + announcement;
-			if(!isSplit)
-				total = await clan.calculateTopExpWeekly(clanName, numTop);
-			else {
-				combat = await clan.calculateTopExpWeekly(clanName, numTop, "combat");
-				skilling = await clan.calculateTopExpWeekly(clanName, numTop, "skilling");
-			}
-			break;
-		case 'monthly':
-			announcement = "This month's " + announcement;
-			if(!isSplit)
-				total = await clan.calculateTopExpMonthly(clanName, numTop);
-			else {
-				combat = await clan.calculateTopExpMonthly(clanName, numTop, "combat");
-				skilling = await clan.calculateTopExpMonthly(clanName, numTop, "skilling");
-			}
-			break;
-		case 'event':
-			announcement = "This event's " + announcement;
-			if(!isSplit)
-				total = await clan.calculateTopExpEvent(clanName, numTop);
-			else {
-				combat = await clan.calculateTopExpEvent(clanName, numTop, "combat");
-				skilling = await clan.calculateTopExpEvent(clanName, numTop, "skilling");
-			}
-			break;
-
-	}
-	if(!isSplit) {
-		for(var i = 0; i < numTop; i++) {
-			if(typeof total[i].name != 'undefined')
-				announcement += `\n${i+1}) ${total[i].name} at ${total[i].exp.toLocaleString()}` + " exp.";
-		}
-	}
-	else {
-		announcement += "\n***COMBAT***"
-		for(var i = 0; i < numTop; i++) {
-			if(typeof combat[i].name != 'undefined')
-				announcement += `\n${i+1}) ${combat[i].name} at ${combat[i].exp.toLocaleString()}` + " exp.";
-		}
-		announcement += "\n***SKILLING***"
-		for(var i = 0; i < numTop; i++) {
-			if(typeof skilling[i].name != 'undefined')
-				announcement += `\n${i+1}) ${skilling[i].name} at ${skilling[i].exp.toLocaleString()}` + " exp.";
-		}
-	}
+	var message = annmsg.makeExpAnnouncementMessage(clanName, numTop, time, isSplit);
 	if(isSpam) {
-		spam_hook.send("```\n" + announcement + "\n```");
+		spam_hook.send(message);
 	} else {
-		ach_hook.send("```\n" + announcement + "\n```");
-	}
-	
+		ach_hook.send(message);
+	}	
 }
 
-function makeSkillAchievementAnnouncement(skill, name, level) {
-	let embed = new Discord.RichEmbed()
-							.setTitle(`${name.toLocaleString()} has achieved level ${level} in ${skill.toLowerCase()}!`)
-							.setThumbnail(resources.skillingIcons[skill.toLowerCase()])
-							.setColor(level > 99 ? 0xffe900 : 0x00AE86);
-	//console.log(embed)
-	ach_hook.send(embed)
+function sendAchHookMessage(message){
+	ach_hook.send(message);
+
 }
 
 function makeUserSkillAchievementAnnouncement(name, new99sAnd120s) {
 	for(let skill in new99sAnd120s['99s']){
 		let skillName = new99sAnd120s['99s'][skill];
-		makeSkillAchievementAnnouncement(skillName, name, 99);
+		sendAchHookMessage(annmsg.makeAchAnnouncementMessage(skillName, name, 99));
 	}
 	for(let skill in new99sAnd120s['120s']){
 		let skillName = new99sAnd120s['120s'][skill];
-		makeSkillAchievementAnnouncement(skillName, name, 120);
+		sendAchHookMessage(annmsg.makeAchAnnouncementMessage(skillName, name, 120));
 	}
 }
 
@@ -117,7 +54,6 @@ var hourly_update = schedule.scheduleJob('30 * * * *', function(){
 	new Promise(() => {
 		clan.updateClan('Sorrow Knights').then((new99sAnd120s) =>{
 			for(name in new99sAnd120s){
-				
 				makeUserSkillAchievementAnnouncement(name, new99sAnd120s[name]);
 			}
 		})
@@ -182,294 +118,174 @@ client.on('ready', () => {
 });
 
 client.on('message', msg => {
-  if (msg.content[0] === '!') {
+if (msg.content[0] === '!') {
     var args = msg.content.split(" ");
     var command = args[0];
 	if(checkForInjection(msg.content)) { // have to sanitize my inputs
 		msg.reply("Fuck you.");			 // wouldn't want an injection attack now would we :)
-	} else if(command === '!max'){
-			getName(args, msg.member.user.id).then(name => {
-				max.calcExpToMax(name).then(function(exp) {
-					msg.channel.send(name + ' has ' + exp.toLocaleString() + ' exp left to max.');
-				}).catch( rej => {
-					msg.channel.send('Invalid username.');
-				});
-			});
-		} else if(command === '!daily') {
-			// gives the current top X players for the daily time table
-			clanChannel = msg.channel;
-			makeExpAnnouncement('Sorrow Knights', 5, 'daily');
-		} else if(command === '!weekly') {
-			// gives the current top X players for the weekly time table
-			clanChannel = msg.channel;
-			makeExpAnnouncement('Sorrow Knights', 5, 'weekly');
-		} else if(command === '!monthly') {
-			// gives the current top X players for the monthly time table
-			clanChannel = msg.channel;
-			makeExpAnnouncement('Sorrow Knights', 5, 'monthly');
-		} else if(command === '!exp' || command === '!Exp') {
-			getName(args, msg.member.user.id).then(name => {
-				if(name != null) {
-					clan.getUserTable(name, makeUserSkillAchievementAnnouncement).then(res => {
-						var config = {
-							drawHorizontalLine: (index, size) => {
-								return index === 0 || index === 1 || index === size;
-							},
-							columns: {
-								0: {
-									alignment: 'left',
-									minWidth: 5
-								},
-								1: {
-									alignment: 'right',
-									minWidth: 5
-								},
-								2: {
-									alignment: 'right',
-									minWidth: 5
-								},
-								3: {
-									alignment: 'right',
-									minWidth: 5
-								}
-							}
-						};
-						var t = table(res, config);
-						msg.channel.send('```\n'+ t + '\n```');
-					}).catch( rej => {
-						msg.channel.send('Invalid username.');
-					});
-				} else {
-					msg.reply('Please provide the username you wish to check.');
-				}
-			});
-		} else if(command === "!canjoin") {
-			// concatenate the username args
-			if(args.length >= 2) {
-				// concatenate the username args
-				var name = "";
-				for(var i = 1; i < args.length; i++) {
-					name += args[i];
-					if(i != args.length-1) name += " ";
-				}
-				max.canTheyJoinTheClan(name).then(res => {
-					if(res) {
-						msg.channel.send(name + " is eligible to join the clan!");
+	} else if (command.toUpperCase() === '!rank'.toUpperCase()) {
+		getName(args, msg.member.user.id).then(name => {
+			if(name != null) {
+				clan.getUserRank(name, `Sorrow Knights`, `combat`, `event`).then(res => {
+					if(Object.keys(res).length > 0) {
+						msg.channel.send("**COMBAT:** Rank " + res.rank + " at " + res.exp.toLocaleString() + " exp.");
 					} else {
-						msg.channel.send("Unfortunately, " + name + " does not meet the minimum requirements to join the clan.");
+						msg.channel.send("No combat exp gained.");
 					}
-					max.getHiscoreTable(name).then(res => {
-						var config = {
-							drawHorizontalLine: (index, size) => {
-								return index === 0 || index === 1 || index === size;
-							},
-							columns: {
-								0: {
-									alignment: 'left',
-									minWidth: 5
-								},
-								1: {
-									alignment: 'right',
-									minWidth: 5
-								},
-								2: {
-									alignment: 'right',
-									minWidth: 5
-								}
-							}
-						};
-						var t = table(res, config);
-						msg.channel.send('```\n' + t + '\n```');
+				}).then( res => {
+					clan.getUserRank(name, 'Sorrow Knights', 'skilling', 'event').then(res => {
+						if(Object.keys(res).length > 0) {
+							msg.channel.send("**SKILLING:** Rank " + res.rank + " at " + res.exp.toLocaleString() + " exp.");
+						} else {
+							msg.channel.send("No skilling exp gained.");
+						}
 					})
-				}).catch( rej => {
-					console.log(rej);
-					msg.channel.send('Invalid username.');
+				}).catch(err => {
+					msg.channel.send("Failed to find user data. Or no exp gained.")
 				});
 			} else {
 				msg.reply('Please provide the username you wish to check.');
 			}
-		} else if (command.toUpperCase() === '!clanexp'.toUpperCase()) {
-			getName(args, msg.member.user.id).then(name => {
-				if(name != null) {
-					clan.getClanExp(name).then(res => {
-						if(res.length > 0) {
-							msg.channel.send(name+" has gained a total of " + parseInt(res, 10).toLocaleString() + " exp since joining the clan.");
+		});
+	} else if (command.toUpperCase() === '!leaderboard'.toUpperCase()) {
+		makeExpAnnouncement('Sorrow Knights', 5, 'event', true);
+	} else if (command.toUpperCase() === '!log'.toUpperCase()) {
+		getName(args, msg.member.user.id).then(name => {
+			if(name != null) {
+				console.log(name);
+				max.getALog(name).then(res => {
+					
+					max.getUserPNG(name).then((image_url)=>{
+						let embed = new Discord.RichEmbed()
+						.setTitle(`${name.toLocaleString()}'s Adventure Log`)
+						.setThumbnail(image_url.uri.href)
+						.setColor(0xe500ff);
+	
+						for (var i in res) {
+							let val = res[i];
+							embed.addField(val.date, val.details, false);
 						}
-					}).catch(err => {
-						msg.channel.send("Failed to find user data. Are they in the clan?")
+						msg.channel.send({embed});
 					});
-				} else {
-					msg.reply('Please provide the username you wish to check.');
-				}
-			}); 
-		} else if (command.toUpperCase() === '!rank'.toUpperCase()) {
-			getName(args, msg.member.user.id).then(name => {
-				if(name != null) {
-					clan.getUserRank(name, `Sorrow Knights`, `combat`, `event`).then(res => {
-						if(Object.keys(res).length > 0) {
-							msg.channel.send("**COMBAT:** Rank " + res.rank + " at " + res.exp.toLocaleString() + " exp.");
-						} else {
-							msg.channel.send("No combat exp gained.");
-						}
-					}).then( res => {
-						clan.getUserRank(name, 'Sorrow Knights', 'skilling', 'event').then(res => {
-							if(Object.keys(res).length > 0) {
-								msg.channel.send("**SKILLING:** Rank " + res.rank + " at " + res.exp.toLocaleString() + " exp.");
-							} else {
-								msg.channel.send("No skilling exp gained.");
-							}
-						})
-					}).catch(err => {
-						msg.channel.send("Failed to find user data. Or no exp gained.")
-					});
-				} else {
-					msg.reply('Please provide the username you wish to check.');
-				}
-			});
-		} else if (command.toUpperCase() === '!leaderboard'.toUpperCase()) {
-			makeExpAnnouncement('Sorrow Knights', 5, 'event', true);
-		} else if (command.toUpperCase() === '!log'.toUpperCase()) {
-			getName(args, msg.member.user.id).then(name => {
-				if(name != null) {
-					console.log(name);
-					max.getALog(name).then(res => {
-						
-						max.getUserPNG(name).then((image_url)=>{
-							let embed = new Discord.RichEmbed()
-							.setTitle(`${name.toLocaleString()}'s Adventure Log`)
-							.setThumbnail(image_url.uri.href)
-							.setColor(0xe500ff);
-		
-							for (var i in res) {
-								let val = res[i];
-								embed.addField(val.date, val.details, false);
-							}
-							msg.channel.send({embed});
-						});
-					}).catch(err => {
-						msg.channel.send("User's profile is either private or username is invalid.")
-					});
-				} else {
-					msg.reply('Please provide the username you wish to check.');
-				}
-			});
-		} else if (command.toUpperCase() === '!myRSN'.toUpperCase()) {
-			getName(args, msg.member.user.id).then(name => {
-				if(name != null) {
-					clan.setUserRSN(msg.member.user.id, name).then(res => {
-						msg.channel.send("Your RSN is now set to " + name + ". You can now use commands such as !exp without specifying a name.")
-					}).catch(err => {
-						msg.channel.send("Failed to set runescape name. Ping Z0CI to get it fixed")
-					});
-				} else {
-					msg.reply('Please provide the username you wish to check.');
-				}
-			});
-		} else if (command.toUpperCase() === '!ports'.toUpperCase()) {
-			if(args.length > 1) {
-				var timer = "";
-				for(var i = 1; i < args.length; i++) {
-					timer += args[i];
-					if(i != args.length-1) name += " ";
-				}
-				try{
-					const minute_reg = /(?<=:)[0-9]*/
-					const hour_reg = /[0-9]*(?=:)/
-					let minutes = timer.match(minute_reg)[0];
-					let hours = timer.match(hour_reg)[0];
-					if(minutes[0] === '0' && minutes.length > 1) {
-						minutes = minutes.substring(1,minutes.length);
-					}
-					if(hours[0] === '0' && hours.length > 1) {
-						hours = hours.substring(1,minutes.length);
-					}
-					let time = new Date();
-					time.setHours(time.getHours()+ parseInt(hours));
-					time.setMinutes(time.getMinutes()+parseInt(minutes));
-
-					schedule.scheduleJob(time, function(){
-						spam_hook.send(`<@${msg.member.user.id}> one of your ships has arrived!`)
-					})
-
-					msg.channel.send("Timer successfully set to go off in " + hours + " hour(s) and " + minutes + " minute(s).")
-				} catch (ex) {
-					msg.channel.send("Invalid time/date please enter the time you see on your ports timer");
-				}
+				}).catch(err => {
+					msg.channel.send("User's profile is either private or username is invalid.")
+				});
 			} else {
-				msg.channel.send("Missing time argument");
+				msg.reply('Please provide the username you wish to check.');
 			}
-		} else if (command.toUpperCase() === '!startEvent'.toUpperCase() && msg.member.user.id === "135244717901348864") {
-			if(args.length > 1) {
-				var timer = "";
-				for(var i = 1; i < args.length; i++) {
-					timer += args[i];
-					if(i != args.length-1) name += " ";
-				}
-				try{
-					const minute_reg = /(?<=:)[0-9]*/
-					const hour_reg = /[0-9]*(?=:)/
-					let minutes = timer.match(minute_reg)[0];
-					let hours = timer.match(hour_reg)[0];
-					if(minutes[0] === '0' && minutes.length > 1) {
-						minutes = minutes.substring(1,minutes.length);
-					}
-					if(hours[0] === '0' && hours.length > 1) {
-						hours = hours.substring(1,minutes.length);
-					}
-					let time = new Date();
-					time.setHours(time.getHours()+ parseInt(hours));
-					time.setMinutes(time.getMinutes()+parseInt(minutes));
-
-					schedule.scheduleJob(time, function(){
-						clan.setEventXp().then(()=>{
-							spam_hook.send(`Double exp has begun! You can now track your exp gains throughout the weekend and compare with your clannies using the commands \`!rank\` and \`!leaderboard\`. Happy Gains!`);
-						});
-					})
-
-					msg.channel.send("The exp table tracking double exp will reset in " + hours + " hour(s) and " + minutes + " minute(s).")
-				} catch (ex) {
-					msg.channel.send("Invalid time/date please enter the time you see on your ports timer");
-				}
-			} else {
-				msg.channel.send("Missing time argument");
+		});
+	} else if (command.toUpperCase() === '!ports'.toUpperCase()) {
+		if(args.length > 1) {
+			var timer = "";
+			for(var i = 1; i < args.length; i++) {
+				timer += args[i];
+				if(i != args.length-1) name += " ";
 			}
-		} else if (command.toUpperCase() === '!endEvent'.toUpperCase() && msg.member.user.id === "135244717901348864") {
-			if(args.length > 1) {
-				var timer = "";
-				for(var i = 1; i < args.length; i++) {
-					timer += args[i];
-					if(i != args.length-1) name += " ";
+			try{
+				const minute_reg = /(?<=:)[0-9]*/
+				const hour_reg = /[0-9]*(?=:)/
+				let minutes = timer.match(minute_reg)[0];
+				let hours = timer.match(hour_reg)[0];
+				if(minutes[0] === '0' && minutes.length > 1) {
+					minutes = minutes.substring(1,minutes.length);
 				}
-				try{
-					const minute_reg = /(?<=:)[0-9]*/
-					const hour_reg = /[0-9]*(?=:)/
-					let minutes = timer.match(minute_reg)[0];
-					let hours = timer.match(hour_reg)[0];
-					if(minutes[0] === '0' && minutes.length > 1) {
-						minutes = minutes.substring(1,minutes.length);
-					}
-					if(hours[0] === '0' && hours.length > 1) {
-						hours = hours.substring(1,minutes.length);
-					}
-					let time = new Date();
-					time.setHours(time.getHours()+ parseInt(hours));
-					time.setMinutes(time.getMinutes()+parseInt(minutes));
-
-					schedule.scheduleJob(time, function(){
-						clan.setEventEndXp().then(()=>{
-							spam_hook.send(`Double exp is over! The final exp totals have been saved and the final leaderboard will be updated in a bit. For now it will keep updating with current xp while dev sleeps.`);
-						});
-					})
-
-					msg.channel.send("The exp table tracking double exp will be finalized in " + hours + " hour(s) and " + minutes + " minute(s).")
-				} catch (ex) {
-					msg.channel.send("Invalid time/date please enter the time you see on your ports timer");
+				if(hours[0] === '0' && hours.length > 1) {
+					hours = hours.substring(1,minutes.length);
 				}
-			} else {
-				msg.channel.send("Missing time argument");
+				let time = new Date();
+				time.setHours(time.getHours()+ parseInt(hours));
+				time.setMinutes(time.getMinutes()+parseInt(minutes));
+
+				schedule.scheduleJob(time, function(){
+					spam_hook.send(`<@${msg.member.user.id}> one of your ships has arrived!`)
+				})
+
+				msg.channel.send("Timer successfully set to go off in " + hours + " hour(s) and " + minutes + " minute(s).")
+			} catch (ex) {
+				msg.channel.send("Invalid time/date please enter the time you see on your ports timer");
 			}
+		} else {
+			msg.channel.send("Missing time argument");
 		}
-	} 
+	} else if (command.toUpperCase() === '!startEvent'.toUpperCase() && msg.member.user.id === "135244717901348864") {
+		if(args.length > 1) {
+			var timer = "";
+			for(var i = 1; i < args.length; i++) {
+				timer += args[i];
+				if(i != args.length-1) name += " ";
+			}
+			try{
+				const minute_reg = /(?<=:)[0-9]*/
+				const hour_reg = /[0-9]*(?=:)/
+				let minutes = timer.match(minute_reg)[0];
+				let hours = timer.match(hour_reg)[0];
+				if(minutes[0] === '0' && minutes.length > 1) {
+					minutes = minutes.substring(1,minutes.length);
+				}
+				if(hours[0] === '0' && hours.length > 1) {
+					hours = hours.substring(1,minutes.length);
+				}
+				let time = new Date();
+				time.setHours(time.getHours()+ parseInt(hours));
+				time.setMinutes(time.getMinutes()+parseInt(minutes));
+
+				schedule.scheduleJob(time, function(){
+					clan.setEventXp().then(()=>{
+						spam_hook.send(`Double exp has begun! You can now track your exp gains throughout the weekend and compare with your clannies using the commands \`!rank\` and \`!leaderboard\`. Happy Gains!`);
+					});
+				})
+
+				msg.channel.send("The exp table tracking double exp will reset in " + hours + " hour(s) and " + minutes + " minute(s).")
+			} catch (ex) {
+				msg.channel.send("Invalid time/date please enter the time you see on your ports timer");
+			}
+		} else {
+			msg.channel.send("Missing time argument");
+		}
+	} else if (command.toUpperCase() === '!endEvent'.toUpperCase() && msg.member.user.id === "135244717901348864") {
+		if(args.length > 1) {
+			var timer = "";
+			for(var i = 1; i < args.length; i++) {
+				timer += args[i];
+				if(i != args.length-1) name += " ";
+			}
+			try{
+				const minute_reg = /(?<=:)[0-9]*/
+				const hour_reg = /[0-9]*(?=:)/
+				let minutes = timer.match(minute_reg)[0];
+				let hours = timer.match(hour_reg)[0];
+				if(minutes[0] === '0' && minutes.length > 1) {
+					minutes = minutes.substring(1,minutes.length);
+				}
+				if(hours[0] === '0' && hours.length > 1) {
+					hours = hours.substring(1,minutes.length);
+				}
+				let time = new Date();
+				time.setHours(time.getHours()+ parseInt(hours));
+				time.setMinutes(time.getMinutes()+parseInt(minutes));
+
+				schedule.scheduleJob(time, function(){
+					clan.setEventEndXp().then(()=>{
+						spam_hook.send(`Double exp is over! The final exp totals have been saved and the final leaderboard will be updated in a bit. For now it will keep updating with current xp while dev sleeps.`);
+					});
+				})
+
+				msg.channel.send("The exp table tracking double exp will be finalized in " + hours + " hour(s) and " + minutes + " minute(s).")
+			} catch (ex) {
+				msg.channel.send("Invalid time/date please enter the time you see on your ports timer");
+			}
+		} else {
+			msg.channel.send("Missing time argument");
+		}
+	} else {
+		getName(args, msg.member.user.id).then(name => {
+			commands.handleResponse(args, command, name, msg.member.user.id, makeUserSkillAchievementAnnouncement).then(result => {
+				console.log(result);
+				msg.channel.send(result);
+			});
+		});
+	}
+} 
 });
 
 client.login(secret.token);
