@@ -24,7 +24,7 @@ function checkForInjection(message) {
 
 // make an announcement for a given time table
 async function makeExpAnnouncement(clanName = 'Sorrow Knights', numTop = 5, time = 'daily', isSplit = false, isSpam = true) {
-	var message = annmsg.makeRankAnnouncementMessage(clanName, numTop, time, isSplit);
+	var message = await annmsg.makeExpAnnouncementMessage(clanName, numTop, time, isSplit);
 	if(isSpam) {
 		spam_hook.send(message);
 	} else {
