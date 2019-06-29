@@ -1,0 +1,113 @@
+{
+    "$schema": "https://vega.github.io/schema/vega/v4.json",
+    "width": 600,
+    "height": 360,
+    "padding": 10,
+    "autosize": "fit",
+
+    "data": [
+      {
+        "name": "table",
+        "values": [
+            {"id": "Biology", "field": 4},
+            {"id": "Chemistry", "field": 8},
+            {"id": "Computer Science", "field": 2},
+            {"id": "Programming", "field": 2},
+            {"id": "Sociology", "field": 8}
+        ],
+        "transform": [
+          {
+            "type": "pie",
+            "field": "field",
+            "as":[
+                "ff_startAngle",
+                "ff_endAngle"
+            ],
+            "startAngle": 0,
+            "endAngle": 6.29,
+            "sort": false
+          }
+        ]
+      }
+    ],
+  
+    "scales": [
+      {
+        "name": "color",
+        "type": "ordinal",
+        "domain": {"data": "table", "field": "id"},
+        "range": {"scheme": "rainbow"}
+      }
+    ],
+    "legends": [
+        {
+            "stroke": "color",
+            "title": "Gains Ranking",
+            "orient": "right",
+            "padding": {"value":10},
+            "encode": {
+                "labels": {
+                    "enter": {
+                        "fill": {"value": "white"},
+                        "fontSize": {"value": 20}
+                    }
+                },
+                "title": {
+                    "enter": {
+                        "fill": {"value": "white"},
+                        "fontSize": {"value": 18}
+                    }
+                },
+                "legend": {
+                    "enter": {
+                        "x": {"signal": "width * 3 / 4"}
+                    }
+                }
+            }
+        }
+    ],
+    "marks": [
+      {
+        "type": "arc",
+        "from": {"data": "table"},
+        "encode": {
+          "enter": {
+            "fill": {"scale": "color", "field": "id"},
+            "x": {"signal": "height / 2"},
+            "y": {"signal": "height / 2"},
+            "startAngle": {"field": "ff_startAngle"},
+            "endAngle": {"field": "ff_endAngle"},
+            "innerRadius": {"signal": "height / 4"},
+            "outerRadius": {"signal": "height / 2"},
+            "cornerRadius": {"value": 0},
+            "tooltip": {"field": "id"}
+          }
+        }
+      },
+      {
+          "name": "mark_text",
+          "type": "text",
+          "from": {"data": "table"},
+          "encode": {
+            "enter": {
+
+                "text": {"signal": "(datum['field'] > 1000) ? datum['field']/1000 +'M' : datum['field'] + 'K'"},
+            
+                "x": {"signal": "height / 2"},
+                "y": {"signal": "height / 2"},
+
+                "radius": {"value": 130},
+                "angle": {"signal": "(180*(datum['ff_startAngle'])/3.14) < 180 ? 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14) + 180 : 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14)"},
+                "theta": {"signal": "(datum['ff_startAngle'] + datum['ff_endAngle'])/2"},
+                
+                "fill": {"value": "black"},
+                "font": {"value": "Helvetica"},
+                "fontSize": {"value": 14},
+                
+                "align": {"value": "center"},
+                "baseline": {"value": "middle"}
+            }
+          }
+      }
+    ]
+}

@@ -131,6 +131,18 @@ async function handleMyRSN(name, id) {
     //}
 }
 
+async function handleGTime(time, num = 10) {
+    if(num > 20) {
+        num = 20;
+    }
+    let canDo = await annmsg.makeRankAnnouncementMessage('Sorrow Knights', num, time, false);
+    if(canDo) {
+        return {files: ["./View/rank.png"]}
+    } else {
+        return "Could not make image."
+    }
+}
+
 async function handleResponse(args, command, name, id, ach_hook_callback) {
     command = normalizeCommand(command);
     if        (command === 'max') {
@@ -147,6 +159,14 @@ async function handleResponse(args, command, name, id, ach_hook_callback) {
         return await handleClanExp(name);
     } else if (command === 'myrsn') {
         return await handleMyRSN(name, id);
+    } else if (command === 'gdaily'  || 
+               command === 'gweekly' ||
+               command === 'gmonthly') {
+        if(args.length > 1) {
+            if(!isNaN(args[1]))
+                return await handleGTime(command.substr(1), parseInt(args[1]));
+        }
+        return await handleGTime(command.substr(1))
     }
 }
 
