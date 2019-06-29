@@ -132,8 +132,8 @@ async function handleMyRSN(name, id) {
 }
 
 async function handleGTime(time, num = 10) {
-    if(num > 20) {
-        num = 20;
+    if(num > 15) {
+        num = 15;
     }
     let canDo = await annmsg.makeRankAnnouncementMessage('Sorrow Knights', num, time, false);
     if(canDo) {

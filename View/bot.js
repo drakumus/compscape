@@ -24,12 +24,24 @@ function checkForInjection(message) {
 
 // make an announcement for a given time table
 async function makeExpAnnouncement(clanName = 'Sorrow Knights', numTop = 5, time = 'daily', isSplit = false, isSpam = true) {
-	var message = await annmsg.makeExpAnnouncementMessage(clanName, numTop, time, isSplit);
-	if(isSpam) {
-		spam_hook.send(message);
-	} else {
-		ach_hook.send(message);
-	}	
+	if(numTop > 15) {
+        numTop = 15;
+    }
+    let canDo = await annmsg.makeRankAnnouncementMessage('Sorrow Knights', numTop, time, false);
+    if(canDo) {
+        if(isSpam) {
+			spam_hook.send({files: ["./View/rank.png"]});
+		} else {
+			ach_hook.send({files: ["./View/rank.png"]});
+		}	
+    } else {
+		if(isSpam) {
+			spam_hook.send("Not enough data to make announcement.");
+		} else {
+			ach_hook.send("Not enough data to make announcement.");
+		}
+	}
+	return canDo;
 }
 
 function sendAchHookMessage(message){
@@ -59,6 +71,8 @@ var hourly_update = schedule.scheduleJob('30 * * * *', function(){
 	});
 })
 
+makeExpAnnouncement('Sorrow Knights', 10, 'daily', false, true);
+
 // at 0 gmt
 var daily_job = schedule.scheduleJob('0 0 * * *', function(){
 	// calculate the last days top exp and send to discord channel
@@ -75,7 +89,7 @@ var daily_job = schedule.scheduleJob('0 0 * * *', function(){
 var weekly_job = schedule.scheduleJob('0 0 * * 1', function(){
 	// calculate the last week's top exp and send to discord channel
 	var numTop = 5;
-	makeExpAnnouncement('Sorrow Knights', 5, 'weekly', false, false).then (res => {
+	makeExpAnnouncement('Sorrow Knights', 10, 'weekly', false, false).then (res => {
 		clan.setWeeklyXp();
 	});
 	// send stuff to discord channel
@@ -84,7 +98,7 @@ var weekly_job = schedule.scheduleJob('0 0 * * 1', function(){
 // at 0 gmt every first day of the month update monthly
 var monthly_job = schedule.scheduleJob('0 0 1 * *', function(){
 	// calculate the last month's top exp and send to discord channel
-	makeExpAnnouncement('Sorrow Knights', 5, 'monthly', false, false).then (res => {
+	makeExpAnnouncement('Sorrow Knights', 10, 'monthly', false, false).then (res => {
 		clan.setMonthlyXp();
 	});
 	// send stuff to discord channel
