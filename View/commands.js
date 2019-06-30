@@ -139,8 +139,49 @@ async function handleGTime(time, num = 10) {
     if(canDo) {
         return {files: ["./View/rank.png"]}
     } else {
-        return "Could not make image."
+        return "Could not make image, probably not enough data yet."
     }
+}
+
+function makeEpeen(percentile) {
+    let epeenLength = Math.round((1-percentile) * 10);
+    let epeen = "**3"
+    for(let i = 0; i < epeenLength; i++) {
+        epeen += "="
+    }
+    epeen += "D**";
+    return epeen;
+}
+
+async function handleEPeen(name) {
+    let data = await annmsg.makeEpeenAnnouncementMessage(name);
+    if(!data){
+        return "This epeen cannot be measured."
+    }
+    let message = ""
+    // DAILY
+    message += "***:regional_indicator_d: :regional_indicator_a: :regional_indicator_i: :regional_indicator_l: :regional_indicator_y:***\n"
+    message += `**Rank:**           ${data.daily.userRank}\n`;
+    message += `**Percentile:** ${(data.daily.userPercentile*100).toFixed(2)}%\n`;
+    message += `**Epeen:**         ${makeEpeen(data.daily.userPercentile)}\n`;
+    // WEEKLY
+    message += ":regional_indicator_w::regional_indicator_e::regional_indicator_e::regional_indicator_k::regional_indicator_l::regional_indicator_y:\n"
+    message += `**Rank:**           ${data.weekly.userRank}\n`;
+    message += `**Percentile:** ${(data.weekly.userPercentile*100).toFixed(2)}%\n`;
+    message += `**Epeen:**         ${makeEpeen(data.weekly.userPercentile)}\n`;
+    // MONTHLY
+    message += ":regional_indicator_m::regional_indicator_o::regional_indicator_n::regional_indicator_t::regional_indicator_h::regional_indicator_l::regional_indicator_y:\n"
+    message += `**Rank:**           ${data.monthly.userRank}\n`;
+    message += `**Percentile:** ${(data.monthly.userPercentile*100).toFixed(2)}%\n`;
+    message += `**Epeen:**         ${makeEpeen(data.monthly.userPercentile)}\n`;
+    // TOTAL
+    message += ":regional_indicator_t::regional_indicator_o::regional_indicator_t::regional_indicator_a::regional_indicator_l:\n"
+    message += `**Rank:**           ${data.total.userRank}\n`;
+    message += `**Percentile:** ${(data.total.userPercentile*100).toFixed(2)}%\n`;
+    message += `**Epeen:**         ${makeEpeen(data.total.userPercentile)}\n`;
+    message += "Below you can see how your exp shapes up against the rest of the clan's!"
+    console.log(message);
+    return {message: message, files: ["./View/epeen.png"]}
 }
 
 async function handleResponse(args, command, name, id, ach_hook_callback) {
@@ -167,6 +208,8 @@ async function handleResponse(args, command, name, id, ach_hook_callback) {
                 return await handleGTime(command.substr(1), parseInt(args[1]));
         }
         return await handleGTime(command.substr(1))
+    } else if (command === 'epeen') {
+        return await handleEPeen(name);
     }
 }
 

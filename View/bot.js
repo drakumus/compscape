@@ -71,8 +71,6 @@ var hourly_update = schedule.scheduleJob('30 * * * *', function(){
 	});
 })
 
-makeExpAnnouncement('Sorrow Knights', 10, 'daily', false, true);
-
 // at 0 gmt
 var daily_job = schedule.scheduleJob('0 0 * * *', function(){
 	// calculate the last days top exp and send to discord channel
@@ -294,7 +292,11 @@ if (msg.content[0] === '!') {
 		getName(args, msg.member.user.id).then(name => {
 			commands.handleResponse(args, command, name, msg.member.user.id, makeUserSkillAchievementAnnouncement).then(result => {
 				console.log(result);
-				msg.channel.send(result);
+				if(typeof result === 'object'){
+					msg.channel.send(result.message, {files: result.files});
+				} else if (result.length > 0) {
+					msg.channel.send(result);
+				}
 			});
 		});
 	}

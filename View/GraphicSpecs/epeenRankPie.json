@@ -1,0 +1,628 @@
+{
+    "$schema": "https://vega.github.io/schema/vega/v4.json",
+    "width": 900,
+    "height": 720,
+    "padding": 10,
+    "autosize": "fit",
+    "data": [
+        {
+            "name": "total",
+            "values": [
+                {
+                    "id": "Programming",
+                    "field": 1
+                },
+                {
+                    "id": "Sociology",
+                    "field": 1000000
+                }
+            ],
+            "transform": [
+                {
+                    "type": "pie",
+                    "field": "field",
+                    "as": [
+                        "ff_startAngle",
+                        "ff_endAngle"
+                    ],
+                    "startAngle": 1.5725,
+                    "endAngle": 7.8625,
+                    "sort": false
+                }
+            ]
+        },
+        {
+            "name": "daily",
+            "values": [
+                {
+                    "id": "Programming",
+                    "field": 1
+                },
+                {
+                    "id": "Sociology",
+                    "field": 100
+                }
+            ],
+            "transform": [
+                {
+                    "type": "pie",
+                    "field": "field",
+                    "as": [
+                        "ff_startAngle",
+                        "ff_endAngle"
+                    ],
+                    "startAngle": 1.5725,
+                    "endAngle": 7.8625,
+                    "sort": false
+                }
+            ]
+        },
+        {
+            "name": "weekly",
+            "values": [
+                {
+                    "id": "Programming",
+                    "field": 5
+                },
+                {
+                    "id": "Sociology",
+                    "field": 5
+                }
+            ],
+            "transform": [
+                {
+                    "type": "pie",
+                    "field": "field",
+                    "as": [
+                        "ff_startAngle",
+                        "ff_endAngle"
+                    ],
+                    "startAngle": 1.5725,
+                    "endAngle": 7.8625,
+                    "sort": false
+                }
+            ]
+        },
+        {
+            "name": "monthly",
+            "values": [
+                {
+                    "id": "Programming",
+                    "field": 10
+                },
+                {
+                    "id": "Sociology",
+                    "field": 3
+                }
+            ],
+            "transform": [
+                {
+                    "type": "pie",
+                    "field": "field",
+                    "as": [
+                        "ff_startAngle",
+                        "ff_endAngle"
+                    ],
+                    "startAngle": 1.5725,
+                    "endAngle": 7.8625,
+                    "sort": false
+                }
+            ]
+        }
+    ],
+    "scales": [
+        {
+            "name": "color",
+            "type": "ordinal",
+            "domain": {
+                "data": "monthly",
+                "field": "id"
+            },
+            "range": {
+                "scheme": "rainbow",
+                "extent": [
+                    0.45,
+                    0.95
+                ]
+            }
+        }
+    ],
+    "legends": [
+        {
+            "stroke": "color",
+            "fill": "color",
+            "title": "Gains",
+            "orient": "right",
+            "padding": {
+                "value": 10
+            },
+            "encode": {
+                "labels": {
+                    "enter": {
+                        "fill": {
+                            "value": "white"
+                        },
+                        "fontSize": {
+                            "value": 26
+                        }
+                    }
+                },
+                "title": {
+                    "enter": {
+                        "fill": {
+                            "value": "white"
+                        },
+                        "fontSize": {
+                            "value": 30
+                        }
+                    }
+                },
+                "legend": {
+                    "enter": {
+                        "x": {
+                            "signal": "width * 3 / 4"
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "marks": [
+        {
+            "type": "arc",
+            "from": {
+                "data": "total"
+            },
+            "encode": {
+                "enter": {
+                    "fill": {
+                        "scale": "color",
+                        "field": "id"
+                    },
+                    "x": {
+                        "signal": "width / 4"
+                    },
+                    "y": {
+                        "signal": "height / 4 -5"
+                    },
+                    "startAngle": {
+                        "field": "ff_startAngle"
+                    },
+                    "endAngle": {
+                        "field": "ff_endAngle"
+                    },
+                    "innerRadius": {
+                        "signal": "90"
+                    },
+                    "outerRadius": {
+                        "signal": "height / 4"
+                    },
+                    "cornerRadius": {
+                        "value": 0
+                    },
+                    "tooltip": {
+                        "field": "id"
+                    }
+                }
+            }
+        },
+        {
+            "type": "arc",
+            "from": {
+                "data": "daily"
+            },
+            "encode": {
+                "enter": {
+                    "fill": {
+                        "scale": "color",
+                        "field": "id"
+                    },
+                    "x": {
+                        "signal": "3 *width / 4 + 10"
+                    },
+                    "y": {
+                        "signal": "height / 4 -5"
+                    },
+                    "startAngle": {
+                        "field": "ff_startAngle"
+                    },
+                    "endAngle": {
+                        "field": "ff_endAngle"
+                    },
+                    "innerRadius": {
+                        "signal": "90"
+                    },
+                    "outerRadius": {
+                        "signal": "height / 4"
+                    },
+                    "cornerRadius": {
+                        "value": 0
+                    },
+                    "tooltip": {
+                        "field": "id"
+                    }
+                }
+            }
+        },
+        {
+            "type": "arc",
+            "from": {
+                "data": "weekly"
+            },
+            "encode": {
+                "enter": {
+                    "fill": {
+                        "scale": "color",
+                        "field": "id"
+                    },
+                    "x": {
+                        "signal": "width / 4"
+                    },
+                    "y": {
+                        "signal": "3*height / 4 + 5"
+                    },
+                    "startAngle": {
+                        "field": "ff_startAngle"
+                    },
+                    "endAngle": {
+                        "field": "ff_endAngle"
+                    },
+                    "innerRadius": {
+                        "signal": "90"
+                    },
+                    "outerRadius": {
+                        "signal": "height / 4"
+                    },
+                    "cornerRadius": {
+                        "value": 0
+                    },
+                    "tooltip": {
+                        "field": "id"
+                    }
+                }
+            }
+        },
+        {
+            "type": "arc",
+            "from": {
+                "data": "monthly"
+            },
+            "encode": {
+                "enter": {
+                    "fill": {
+                        "scale": "color",
+                        "field": "id"
+                    },
+                    "x": {
+                        "signal": "3 *width / 4 + 10"
+                    },
+                    "y": {
+                        "signal": "3 * height / 4 + 5"
+                    },
+                    "startAngle": {
+                        "field": "ff_startAngle"
+                    },
+                    "endAngle": {
+                        "field": "ff_endAngle"
+                    },
+                    "innerRadius": {
+                        "signal": "90"
+                    },
+                    "outerRadius": {
+                        "signal": "height / 4"
+                    },
+                    "cornerRadius": {
+                        "value": 0
+                    },
+                    "tooltip": {
+                        "field": "id"
+                    }
+                }
+            }
+        },
+        {
+            "name": "mark_total",
+            "type": "text",
+            "from": {
+                "data": "total"
+            },
+            "encode": {
+                "enter": {
+                    "text": {
+                        "signal": "(datum['field'] >= 1000000) ? round(datum['field']/100000)/10 + 'B' : (datum['field'] >= 1000) ? round(datum['field']/100)/10 +'M' : datum['field'] + 'K'"
+                    },
+                    "x": {
+                        "signal": "width / 4"
+                    },
+                    "y": {
+                        "signal": "height / 4 -5"
+                    },
+                    "radius": {
+                        "value": 135
+                    },
+                    "angle": {
+                        "signal": "(180*((.5*datum['ff_endAngle'])+datum['ff_startAngle'])/3.14) < 180 ? 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14) + 180 : 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14)"
+                    },
+                    "theta": {
+                        "signal": "(datum['ff_startAngle'] + datum['ff_endAngle'])/2"
+                    },
+                    "fill": {
+                        "value": "black"
+                    },
+                    "fontSize": {
+                        "value": 20
+                    },
+                    "fontStyle": {
+                        "value": "bold"
+                    },
+                    "align": {
+                        "value": "center"
+                    },
+                    "baseline": {
+                        "value": "middle"
+                    }
+                }
+            }
+        },
+        {
+            "name": "mark_daily",
+            "type": "text",
+            "from": {
+                "data": "daily"
+            },
+            "encode": {
+                "enter": {
+                    "text": {
+                        "signal": "datum['field']%"
+                    },
+                    "x": {
+                        "signal": "3 *width / 4 + 10"
+                    },
+                    "y": {
+                        "signal": "height / 4 -5"
+                    },
+                    "radius": {
+                        "value": 135
+                    },
+                    "angle": {
+                        "signal": "(180*((.5*datum['ff_endAngle'])+datum['ff_startAngle'])/3.14) < 180 ? 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14) + 180 : 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14)"
+                    },
+                    "theta": {
+                        "signal": "(datum['ff_startAngle'] + datum['ff_endAngle'])/2"
+                    },
+                    "fill": {
+                        "value": "black"
+                    },
+                    "fontSize": {
+                        "value": 20
+                    },
+                    "fontStyle": {
+                        "value": "bold"
+                    },
+                    "align": {
+                        "value": "center"
+                    },
+                    "baseline": {
+                        "value": "middle"
+                    }
+                }
+            }
+        },
+        {
+            "name": "mark_weekly",
+            "type": "text",
+            "from": {
+                "data": "weekly"
+            },
+            "encode": {
+                "enter": {
+                    "text": {
+                        "signal": "(datum['field'] >= 1000000) ? round(datum['field']/100000)/10 + 'B' : (datum['field'] >= 1000) ? round(datum['field']/100)/10 +'M' : datum['field'] + 'K'"
+                    },
+                    "x": {
+                        "signal": "width / 4"
+                    },
+                    "y": {
+                        "signal": "3*height / 4 + 5"
+                    },
+                    "radius": {
+                        "value": 135
+                    },
+                    "angle": {
+                        "signal": "(180*((.5*datum['ff_endAngle'])+datum['ff_startAngle'])/3.14) < 180 ? 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14) + 180 : 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14)"
+                    },
+                    "theta": {
+                        "signal": "(datum['ff_startAngle'] + datum['ff_endAngle'])/2"
+                    },
+                    "fill": {
+                        "value": "black"
+                    },
+                    "fontSize": {
+                        "value": 20
+                    },
+                    "fontStyle": {
+                        "value": "bold"
+                    },
+                    "align": {
+                        "value": "center"
+                    },
+                    "baseline": {
+                        "value": "middle"
+                    }
+                }
+            }
+        },
+        {
+            "name": "mark_monthly",
+            "type": "text",
+            "from": {
+                "data": "monthly"
+            },
+            "encode": {
+                "enter": {
+                    "text": {
+                        "signal": "(datum['field'] >= 1000000) ? round(datum['field']/100000)/10 + 'B' : (datum['field'] >= 1000) ? round(datum['field']/100)/10 +'M' : datum['field'] + 'K'"
+                    },
+                    "x": {
+                        "signal": "3 *width / 4 + 10"
+                    },
+                    "y": {
+                        "signal": "3 * height / 4 + 5"
+                    },
+                    "radius": {
+                        "value": 135
+                    },
+                    "angle": {
+                        "signal": "(180*((.5*datum['ff_endAngle'])+datum['ff_startAngle'])/3.14) < 180 ? 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14) + 180 : 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14)"
+                    },
+                    "theta": {
+                        "signal": "(datum['ff_startAngle'] + datum['ff_endAngle'])/2"
+                    },
+                    "fill": {
+                        "value": "black"
+                    },
+                    "fontSize": {
+                        "value": 20
+                    },
+                    "fontStyle": {
+                        "value": "bold"
+                    },
+                    "align": {
+                        "value": "center"
+                    },
+                    "baseline": {
+                        "value": "middle"
+                    }
+                }
+            }
+        },
+        {
+            "name": "title_total",
+            "type": "text",
+            "encode": {
+                "enter": {
+                    "text": {
+                        "value": "Total Exp"
+                    },
+                    "x": {
+                        "signal": "width / 4"
+                    },
+                    "y": {
+                        "signal": "height / 4 -5"
+                    },
+                    "fill": {
+                        "value": "white"
+                    },
+                    "fontSize": {
+                        "value": 30
+                    },
+                    "fontWeight": {
+                        "value": "bolder"
+                    },
+                    "align": {
+                        "value": "center"
+                    },
+                    "baseline": {
+                        "value": "middle"
+                    }
+                }
+            }
+        },
+        {
+            "name": "title_daily",
+            "type": "text",
+            "encode": {
+                "enter": {
+                    "text": {
+                        "value": "Daily Exp"
+                    },
+                    "x": {
+                        "signal": "3 *width / 4 + 10"
+                    },
+                    "y": {
+                        "signal": "height / 4 -5"
+                    },
+                    "fill": {
+                        "value": "white"
+                    },
+                    "fontSize": {
+                        "value": 30
+                    },
+                    "fontWeight": {
+                        "value": "bolder"
+                    },
+                    "align": {
+                        "value": "center"
+                    },
+                    "baseline": {
+                        "value": "middle"
+                    }
+                }
+            }
+        },
+        {
+            "name": "title_weekly",
+            "type": "text",
+            "encode": {
+                "enter": {
+                    "text": {
+                        "value": "Weekly Exp"
+                    },
+                    "x": {
+                        "signal": "width / 4"
+                    },
+                    "y": {
+                        "signal": "3*height / 4 + 5"
+                    },
+                    "fill": {
+                        "value": "white"
+                    },
+                    "fontSize": {
+                        "value": 28
+                    },
+                    "fontWeight": {
+                        "value": "bolder"
+                    },
+                    "align": {
+                        "value": "center"
+                    },
+                    "baseline": {
+                        "value": "middle"
+                    }
+                }
+            }
+        },
+        {
+            "name": "title_monthly",
+            "type": "text",
+            "encode": {
+                "enter": {
+                    "text": {
+                        "value": "Monthly Exp"
+                    },
+                    "x": {
+                        "signal": "3 *width / 4 + 10"
+                    },
+                    "y": {
+                        "signal": "3 * height / 4 + 5"
+                    },
+                    "fill": {
+                        "value": "white"
+                    },
+                    "fontSize": {
+                        "value": 28
+                    },
+                    "fontWeight": {
+                        "value": "bolder"
+                    },
+                    "align": {
+                        "value": "center"
+                    },
+                    "baseline": {
+                        "value": "middle"
+                    }
+                }
+            }
+        }
+    ]
+}

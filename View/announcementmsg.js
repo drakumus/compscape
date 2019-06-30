@@ -3,7 +3,8 @@ var clan = require('../Model/clan.js');
 const Discord = require('discord.js');
 const fs = require('fs');
 //require('./GraphicSpecs/rankBar.json');
-var rankConfig = require('./GraphicSpecs/rankPie.json')
+var rankConfig = require('./GraphicSpecs/rankPie.json');
+var epeenConfig = require('./GraphicSpecs/epeenPie.json');
 var vega = require('vega');
 const resources = JSON.parse(fs.readFileSync("./View/resources.json", {encoding: 'utf8'}));
 
@@ -117,6 +118,44 @@ async function makeRankAnnouncementMessage(clanName = 'Sorrow Knights', numTop =
 	return result;
 }
 
+async function makeEpeenAnnouncementMessage(user, clanName = 'Sorrow Knights') {
+	let data = await clan.calculateClanAllTimedUserRank(user, clanName, "all");
+	// put data in format useable by chart
+	// don't forget to subtract user exp from clan exp for pie chart!
+	// total exp
+	epeenConfig.data[0].values = [{"id": "Your Exp", "field": parseInt(data.total.userTotal/1000,10)},
+								  {"id": "Clan Exp", "field": parseInt((data.total.clanTotal - data.total.userTotal)/1000, 10)}];
+	// daily exp
+	epeenConfig.data[1].values = [{"id": "Your Exp", "field": parseInt(data.daily.userTotal/1000,10)},
+								  {"id": "Clan Exp", "field": parseInt((data.daily.clanTotal - data.daily.userTotal)/1000, 10)}];
+	// weekly exp
+	epeenConfig.data[2].values = [{"id": "Your Exp", "field": parseInt(data.weekly.userTotal/1000,10)},
+								  {"id": "Clan Exp", "field": parseInt((data.weekly.clanTotal - data.weekly.userTotal)/1000, 10)}];
+	// monthly exp
+	epeenConfig.data[3].values = [{"id": "Your Exp", "field": parseInt(data.monthly.userTotal/1000,10)},
+								  {"id": "Clan Exp", "field": parseInt((data.monthly.clanTotal - data.monthly.userTotal)/1000, 10)}];
+	var view = new vega
+	.View(vega.parse(epeenConfig))
+	.renderer('none')
+	.initialize();
+
+	// generate static PNG file from chart
+	let canvas = await view.toCanvas()
+	// process node-canvas instance for example, generate a PNG stream to write var
+	const stream = canvas.createPNGStream();
+	const out = fs.createWriteStream(__dirname + '/epeen.png');
+	console.log('Writing PNG to file...');
+	stream.pipe(out);
+	let result = await new Promise((res, rej) => {
+		try {
+			out.on('finish', () => {res(true)});
+		} catch {
+			rej(false);
+		}
+	});
+	return !result? false: data;
+}
+
 function makeAchAnnouncementMessage(skill, name, level) {
 	let embed = new Discord.RichEmbed()
 							.setTitle(`${name.toLocaleString()} has achieved level ${level} in ${skill.toLowerCase()}!`)
@@ -128,5 +167,6 @@ function makeAchAnnouncementMessage(skill, name, level) {
 module.exports = {
 	makeExpAnnouncementMessage,
 	makeAchAnnouncementMessage,
-	makeRankAnnouncementMessage
+	makeRankAnnouncementMessage,
+	makeEpeenAnnouncementMessage
 }

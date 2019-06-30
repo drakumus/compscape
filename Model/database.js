@@ -565,6 +565,7 @@ module.exports = {
     updateExpUser,
     updateExpUsers,
     removeUser,
+    removeUsers,
     getClanMembers,
     duplicateTable,
     getClanData,

@@ -119,9 +119,13 @@ async function addNewMembers(clan) {
     var members = await getClanMembers(clan);
     var dbMembers = await db.getClanMembers(clan);
     var newMembers = members.filter(val => !dbMembers.includes(val));
+    var goneMembers = dbMembers.filter(val => !members.includes(val));
 
-
-
+    /*
+    if(goneMembers.length > 0) {
+        db.removeUsers(goneMembers);
+    }
+    */
     if(newMembers.length > 0) {
         // for future use
         //let clan_data = await db.getAllUserData();
@@ -256,6 +260,144 @@ async function getUserTable(name, ach_callback) {
     }
 
     return table;
+}
+
+async function calculateClanTimedTotalExp(clan = "Sorrow Knights", timeSlot = "daily", catagory = "all") {
+    // find and store the difference between the timed table and the current exp table
+    var current_data = timeSlot === "event" ? 
+                       await  db.getClanData(clan, "end"):
+                       await db.getClanData(clan);
+    var timed_data = await db.getClanData(clan, timeSlot);
+    var memberTotals = {};
+    var memberTimedTotals = {}; // where the fuck did the rest go?
+    for(var i in timed_data) {
+        var name = timed_data[i].name;
+        var currentTotal, timedTotal;
+        if(catagory === "all") {
+            currentTotal = calculateTotalExp(current_data[i])
+            timedTotal = calculateTotalExp(timed_data[i]);
+        } else if (catagory === "combat") {
+            currentTotal = calculateCombatExp(current_data[i])
+            timedTotal = calculateCombatExp(timed_data[i]);
+        } else if (catagory === "skilling") {
+            currentTotal = calculateSkillingExp(current_data[i])
+            timedTotal = calculateSkillingExp(timed_data[i]);
+        }
+        var totalDif = currentTotal - timedTotal;
+        if(totalDif > 0 && timedTotal > 0) memberTimedTotals[name] = totalDif;
+        memberTotals[name] = currentTotal;
+    }
+    return {"memberTotals": memberTotals, "timedTotals": timedTotal};
+}
+
+async function calculateAllClanTimedTotalExp(clan = "Sorrow Knights", catagory = "all") {
+    // find and store the difference between the timed table and the current exp table
+    var current_data = await db.getClanData(clan);
+    var timed_data = {}
+    timed_data['daily']   = await db.getClanData(clan, 'daily');
+    timed_data['weekly']  = await db.getClanData(clan, 'weekly');
+    timed_data['monthly'] = await db.getClanData(clan, 'monthly');
+    
+    var memberTotals = [];
+    var memberTimedTotals = {};
+    memberTimedTotals['daily']   = [];
+    memberTimedTotals['weekly']  = [];
+    memberTimedTotals['monthly'] = [];
+    for(var i in current_data) {  // user should be in all timed tables so this works
+        var name = current_data[i].name;
+        var currentTotal;
+        if(catagory === "all") {
+            currentTotal      = calculateTotalExp(current_data[i])
+            timedTotalDaily   = calculateTotalExp(timed_data['daily'][i]);
+            timedTotalWeekly  = calculateTotalExp(timed_data['weekly'][i]);
+            timedTotalMonthly = calculateTotalExp(timed_data['monthly'][i]);
+        } else if (catagory === "combat") {
+            currentTotal      = calculateCombatExp(current_data[i])
+            timedTotalDaily   = calculateCombatExp(timed_data['daily'][i]);
+            timedTotalWeekly  = calculateCombatExp(timed_data['weekly'][i]);
+            timedTotalMonthly = calculateCombatExp(timed_data['monthly'][i]);
+        } else if (catagory === "skilling") {
+            currentTotal      = calculateSkillingExp(current_data[i])
+            timedTotalDaily   = calculateSkillingExp(timed_data['daily'][i]);
+            timedTotalWeekly  = calculateSkillingExp(timed_data['weekly'][i]);
+            timedTotalMonthly = calculateSkillingExp(timed_data['monthly'][i]);
+        }
+        if(currentTotal - timedTotalDaily > 0)
+            memberTimedTotals['daily'].push(  {name: name, exp: currentTotal - timedTotalDaily});
+        if(currentTotal - timedTotalWeekly > 0)
+            memberTimedTotals['weekly'].push( {name: name, exp: currentTotal - timedTotalWeekly});
+        if(currentTotal - timedTotalMonthly > 0)
+            memberTimedTotals['monthly'].push({name: name, exp: currentTotal - timedTotalMonthly});
+        memberTotals.push({name: name, exp: currentTotal});
+    }
+    return {"memberTotals": memberTotals, "timedTotals": memberTimedTotals};
+}
+
+function sortAndRankTotals(user, totals) {
+    let clanTotal = 0;
+    let userRank = 0;
+    let userTotal = 0;
+    let userPercentile = 0;
+    if(Object.keys(totals).length == 0) {
+        return {
+            clanTotal: 0,
+            userRank: 0,
+            userPercentile: 0
+        }
+    }
+    // [1,2,3,4,5]
+    // largest = 1
+    // 
+    for(var i in totals) {
+        var largest = i;
+        for(var p = i; p < totals.length; p++) {
+            if(totals[p].exp > totals[largest].exp) largest = p;
+        }
+
+        // add the largest to the clan total exp
+        clanTotal += totals[largest].exp;
+        // swap
+        let temp = totals[i];
+        totals[i] = totals[largest];
+        totals[largest] = temp;
+    }
+
+    // could combine with above but I'm lazy
+    for(var i in totals) {
+        if(totals[i].name.toLowerCase() == user.toLowerCase()) {
+            userRank = parseInt(i,10) + 1;
+            userTotal = totals[i].exp;
+            userPercentile = userRank / Object.keys(totals).length;
+            break;
+        }
+    }
+    return {
+        userTotal: userTotal,
+        clanTotal: clanTotal,
+        userRank: userRank,
+        userPercentile: userPercentile
+    }
+}
+
+async function calculateClanAllTimedUserRank(user, clan = "Sorrow Knights", category="all"){
+    let res = await calculateAllClanTimedTotalExp(clan, category);
+    let memberTotals = res.memberTotals;
+    let timedTotal = res.timedTotals;
+    // calculate clan total exp while sorting
+    // when user name is seen store total seperately
+    // sort the list until the top x players have been found
+
+    let totalData   = sortAndRankTotals(user, memberTotals);
+    let dailyData   = sortAndRankTotals(user, timedTotal.daily);
+    let weeklyData  = sortAndRankTotals(user, timedTotal.weekly);
+    let monthlyData = sortAndRankTotals(user, timedTotal.monthly);
+    let result = {}
+    result["total"] = totalData;
+    result["daily"] = dailyData;
+    result["weekly"] = weeklyData;
+    result["monthly"] = monthlyData;
+
+    return result;
 }
 
 /**
@@ -440,5 +582,6 @@ module.exports = {
     getClanExp,
     getUserRank,
     getUserRSN,
-    setUserRSN
+    setUserRSN,
+    calculateClanAllTimedUserRank
 }
