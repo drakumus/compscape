@@ -161,7 +161,7 @@ async function handleEPeen(name) {
     }
     let message = ""
     // DAILY
-    message += ":regional_indicator_e: :regional_indicator_p: :regional_indicator_e: :regional_indicator_e: :regional_indicator_n: :Toxic: :regional_indicator_r: :regional_indicator_e: :regional_indicator_p: :regional_indicator_o: :regional_indicator_r: :regional_indicator_t:\n"
+    message += ":regional_indicator_e: :regional_indicator_p: :regional_indicator_e: :regional_indicator_e: :regional_indicator_n:      :regional_indicator_r: :regional_indicator_e: :regional_indicator_p: :regional_indicator_o: :regional_indicator_r: :regional_indicator_t:\n"
     message += `*(Epeens now rounded up thanks to our glorious leader iSlash)*\n`
     message += `-----------------------------------------`
     message += "***DAILY***\n"
