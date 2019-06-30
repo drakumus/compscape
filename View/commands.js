@@ -154,6 +154,9 @@ function makeEpeen(percentile) {
 }
 
 async function handleEPeen(name) {
+    if(name == null) {
+        return "Please set your rsn using the `!myrsn yourname` command or provide the username you wish to check."
+    }
     let data = await annmsg.makeEpeenAnnouncementMessage(name);
     if(!data){
         return "This epeen cannot be measured."
