@@ -144,7 +144,6 @@ async function handleGTime(time, num = 10) {
 }
 
 function makeEpeen(percentile) {
-    if(percentile == 0) { percentile = 1}
     let epeenLength = Math.ceil((1-percentile) * 10);
     let epeen = "**3="
     for(let i = 0; i < epeenLength; i++) {
@@ -190,7 +189,7 @@ async function handleEPeen(name) {
     message += `**Percentile:**  ${(data.total.userPercentile*100).toFixed(2)}%\n`;
     message += `**Experience:** ${data.total.userTotal.toLocaleString()}\n`
     message += `**Epeen:**          ${makeEpeen(data.total.userPercentile)}\n`;
-    message += `-----------------------------------------***YOUR EXP TOTALS VS CLANS!***\n`
+    message += `-----------------------------------------***YOUR EXP TOTALS VS CLAN'S!***\n`
     //message += "Below you can see how your exp shapes up against the rest of the clan's!\n"
     console.log(message);
     return {message: message, files: ["./View/epeen.png"]}

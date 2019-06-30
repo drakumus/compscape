@@ -342,7 +342,7 @@ function sortAndRankTotals(user, totals) {
         return {
             clanTotal: 0,
             userRank: 0,
-            userPercentile: 0
+            userPercentile: 1
         }
     }
     // [1,2,3,4,5]
