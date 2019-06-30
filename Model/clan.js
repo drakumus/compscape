@@ -337,7 +337,7 @@ function sortAndRankTotals(user, totals) {
     let clanTotal = 0;
     let userRank = 0;
     let userTotal = 0;
-    let userPercentile = 0;
+    let userPercentile = 1;
     if(Object.keys(totals).length == 0) {
         return {
             clanTotal: 0,
@@ -367,7 +367,7 @@ function sortAndRankTotals(user, totals) {
         if(totals[i].name.toLowerCase() == user.toLowerCase()) {
             userRank = parseInt(i,10) + 1;
             userTotal = totals[i].exp;
-            userPercentile = userRank / Object.keys(totals).length;
+            userPercentile = (userRank / Object.keys(totals).length);
             break;
         }
     }
@@ -375,7 +375,7 @@ function sortAndRankTotals(user, totals) {
         userTotal: userTotal,
         clanTotal: clanTotal,
         userRank: userRank,
-        userPercentile: userPercentile
+        userPercentile: (1 - userPercentile)
     }
 }
 

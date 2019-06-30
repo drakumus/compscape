@@ -144,7 +144,7 @@ async function handleGTime(time, num = 10) {
 }
 
 function makeEpeen(percentile) {
-    let epeenLength = Math.ceil((1-percentile) * 10);
+    let epeenLength = Math.ceil((percentile) * 10);
     let epeen = "**3="
     for(let i = 0; i < epeenLength; i++) {
         epeen += "="
