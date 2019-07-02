@@ -157,9 +157,11 @@ async function handleThresh(thresh = 7, timePeriod = "weekly") {
     let timedTotal = await clan.calculateClanTimedTotalExp('Sorrow Knights', timePeriod, "all");
     thresh = thresh * 1000000;
     let message = ``;
+    let count = 1;
     for (i in timedTotal) {
         if(timedTotal[i] > thresh) {
-            message += `${i}\n`
+            message += `${count}. ${i}\n`
+            count++;
         }
     }
 
