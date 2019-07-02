@@ -72,6 +72,13 @@ var hourly_update = schedule.scheduleJob('30 * * * *', function(){
 })
 
 // at 0 gmt
+var before_reset_job = schedule.scheduleJob('59 23 * * 7', function() {
+	commands.handleThresh().then (res => {
+		if(typeof res != "undefined" && res.length > 0)
+			spam_hook.send(res);
+	});
+});
+
 var daily_job = schedule.scheduleJob('0 0 * * *', function(){
 	// calculate the last days top exp and send to discord channel
 	var numTop = 10;
