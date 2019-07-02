@@ -77,7 +77,7 @@ var daily_job = schedule.scheduleJob('0 0 * * *', function(){
 	var numTop = 10;
 
 	//hook.send("----------" + n + "----------");
-	makeExpAnnouncement('Sorrow Knights',numTop, 'daily', false, false).then(res => {
+	makeExpAnnouncement('Sorrow Knights', 10, 'daily', false, false).then(res => {
 		clan.setDailyXP();
 	});
 	// send stuff to discord channel

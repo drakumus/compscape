@@ -85,6 +85,9 @@ async function makeRankAnnouncementMessage(clanName = 'Sorrow Knights', numTop =
 		case "monthly":
 			total = await clan.calculateTopExpMonthly(clanName, numTop);
 			break;
+		case "event":
+			total = await clan.calculateTopExpEvent(clanName, numTop);
+			break;
 	}
 	if(total[0].name == undefined) {
 		return false;

@@ -264,31 +264,44 @@ async function getUserTable(name, ach_callback) {
 
 async function calculateClanTimedTotalExp(clan = "Sorrow Knights", timeSlot = "daily", catagory = "all") {
     // find and store the difference between the timed table and the current exp table
-    var current_data = timeSlot === "event" ? 
-                       await  db.getClanData(clan, "end"):
-                       await db.getClanData(clan);
-    var timed_data = await db.getClanData(clan, timeSlot);
-    var memberTotals = {};
-    var memberTimedTotals = {}; // where the fuck did the rest go?
-    for(var i in timed_data) {
-        var name = timed_data[i].name;
-        var currentTotal, timedTotal;
+    var current_data = await db.getClanData(clan);
+    var timed_data;
+    switch(timeSlot) {
+        case "daily":
+            timed_data   = await db.getClanData(clan, 'daily');
+            break;
+        case "weekly":
+            timed_data  = await db.getClanData(clan, 'weekly');
+            break;
+        case "monthly":
+            timed_data = await db.getClanData(clan, 'monthly');
+            break;
+    }
+    
+    var memberTotals = [];
+    memberTimedTotals= [];
+    for(var i in current_data) {  // user should be in all timed tables so this works
+        var name = current_data[i].name;
+        var currentTotal;
         if(catagory === "all") {
             currentTotal = calculateTotalExp(current_data[i])
-            timedTotal = calculateTotalExp(timed_data[i]);
+            timedTotal   = calculateTotalExp(timed_data[i]);
         } else if (catagory === "combat") {
             currentTotal = calculateCombatExp(current_data[i])
-            timedTotal = calculateCombatExp(timed_data[i]);
+            timedTotal   = calculateCombatExp(timed_data[i]);
         } else if (catagory === "skilling") {
             currentTotal = calculateSkillingExp(current_data[i])
-            timedTotal = calculateSkillingExp(timed_data[i]);
+            timedTotal   = calculateSkillingExp(timed_data[i]);
         }
-        var totalDif = currentTotal - timedTotal;
-        if(totalDif > 0 && timedTotal > 0) memberTimedTotals[name] = totalDif;
-        memberTotals[name] = currentTotal;
+        if(currentTotal - timedTotal > 0) {
+            memberTimedTotals[name] = currentTotal - timedTotal;
+            memberTotals[name] = currentTotal;
+        }
     }
-    return {"memberTotals": memberTotals, "timedTotals": timedTotal};
+    
+    return memberTimedTotals;
 }
+
 
 async function calculateAllClanTimedTotalExp(clan = "Sorrow Knights", catagory = "all") {
     // find and store the difference between the timed table and the current exp table
@@ -583,5 +596,6 @@ module.exports = {
     getUserRank,
     getUserRSN,
     setUserRSN,
-    calculateClanAllTimedUserRank
+    calculateClanAllTimedUserRank,
+    calculateClanTimedTotalExp
 }

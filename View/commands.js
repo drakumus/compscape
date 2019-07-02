@@ -153,6 +153,19 @@ function makeEpeen(percentile) {
     return epeen;
 }
 
+async function handleThresh(thresh = 7, timePeriod = "weekly") {
+    let timedTotal = await clan.calculateClanTimedTotalExp('Sorrow Knights', timePeriod, "all");
+    thresh = thresh * 1000000;
+    let message = ``;
+    for (i in timedTotal) {
+        if(timedTotal[i] > thresh) {
+            message += `${i}\n`
+        }
+    }
+
+    return message;
+}
+
 async function handleEPeen(name) {
     if(name == null) {
         return "Please set your rsn using the `!myrsn yourname` command or provide the username you wish to check."
@@ -224,6 +237,8 @@ async function handleResponse(args, command, name, id, ach_hook_callback) {
         return await handleGTime(command.substr(1))
     } else if (command === 'epeen') {
         return await handleEPeen(name);
+    } else if (command === '7mil') {
+        return await handleThresh(7, "weekly");
     }
 }
 
