@@ -245,5 +245,6 @@ async function handleResponse(args, command, name, id, ach_hook_callback) {
 }
 
 module.exports = {
-    handleResponse
+    handleResponse,
+    handleThresh
 }

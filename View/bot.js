@@ -80,6 +80,11 @@ var daily_job = schedule.scheduleJob('0 0 * * *', function(){
 	makeExpAnnouncement('Sorrow Knights', 10, 'daily', false, false).then(res => {
 		clan.setDailyXP();
 	});
+
+	commands.handleThresh().then (res => {
+		if(typeof res != "undefined" && res.length > 0)
+			spam_hook.send(res);
+	})
 	// send stuff to discord channel
 });
 
@@ -294,8 +299,9 @@ if (msg.content[0] === '!') {
 				console.log(result);
 				if(typeof result === 'object'){
 					msg.channel.send(result.message, {files: result.files});
-				} else if (result.length > 0) {
-					msg.channel.send(result);
+				} else if (typeof result != 'undefined') {
+					if (result.length > 0)
+						msg.channel.send(result);
 				}
 			});
 		});
