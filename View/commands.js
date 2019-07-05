@@ -168,7 +168,8 @@ async function handleThresh(thresh = 7, timePeriod = "weekly") {
     return message;
 }
 
-async function handleEPeen(name) {
+async function handleEPeen(name, ach_hook_callback) {
+    let exptable = await clan.getUserTable(name, ach_hook_callback);
     if(name == null) {
         return "Please set your rsn using the `!myrsn yourname` command or provide the username you wish to check."
     }
@@ -238,7 +239,7 @@ async function handleResponse(args, command, name, id, ach_hook_callback) {
         }
         return await handleGTime(command.substr(1))
     } else if (command === 'epeen') {
-        return await handleEPeen(name);
+        return await handleEPeen(name, ach_hook_callback);
     } else if (command === '7mil') {
         return await handleThresh(7, "weekly");
     }
