@@ -341,7 +341,7 @@
                         "value": 135
                     },
                     "angle": {
-                        "signal": "(180*((.5*datum['ff_endAngle'])+datum['ff_startAngle'])/3.14) < 180 ? 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14) + 180 : 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14)"
+                        "signal": "(180*((((datum['ff_endAngle'])-datum['ff_startAngle'])/2)+datum['ff_startAngle'])/3.14) < 180 ? 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14) + 180 : 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14)"
                     },
                     "theta": {
                         "signal": "(datum['ff_startAngle'] + datum['ff_endAngle'])/2"
@@ -385,7 +385,7 @@
                         "value": 135
                     },
                     "angle": {
-                        "signal": "(180*((.5*datum['ff_endAngle'])+datum['ff_startAngle'])/3.14) < 180 ? 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14) + 180 : 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14)"
+                        "signal": "(180*((((datum['ff_endAngle'])-datum['ff_startAngle'])/2)+datum['ff_startAngle'])/3.14) < 180 ? 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14) + 180 : 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14)"
                     },
                     "theta": {
                         "signal": "(datum['ff_startAngle'] + datum['ff_endAngle'])/2"
@@ -429,7 +429,7 @@
                         "value": 135
                     },
                     "angle": {
-                        "signal": "(180*((.5*datum['ff_endAngle'])+datum['ff_startAngle'])/3.14) < 180 ? 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14) + 180 : 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14)"
+                        "signal": "(180*((((datum['ff_endAngle'])-datum['ff_startAngle'])/2)+datum['ff_startAngle'])/3.14) < 180 ? 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14) + 180 : 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14)"
                     },
                     "theta": {
                         "signal": "(datum['ff_startAngle'] + datum['ff_endAngle'])/2"
@@ -473,7 +473,7 @@
                         "value": 135
                     },
                     "angle": {
-                        "signal": "(180*((.5*datum['ff_endAngle'])+datum['ff_startAngle'])/3.14) < 180 ? 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14) + 180 : 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14)"
+                        "signal": "(180*((((datum['ff_endAngle'])-datum['ff_startAngle'])/2)+datum['ff_startAngle'])/3.14) < 180 ? 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14) + 180 : 180-(90-((180*(datum['ff_endAngle'] - datum['ff_startAngle'])/3.14)/2)) + (180*(datum['ff_startAngle'])/3.14)"
                     },
                     "theta": {
                         "signal": "(datum['ff_startAngle'] + datum['ff_endAngle'])/2"
