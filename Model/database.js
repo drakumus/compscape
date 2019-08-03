@@ -378,7 +378,7 @@ async function updateExpUser(name, table = 'experience') {
     var user_skills = await extractSkillDataTable(name, 'experience');
     if(skillData["Ranged"] != null) {   // when I first wrote this I did skillData == {} which obviously passes. Forgot that === was a thing
         newAchieves = check99andEqual(user_skills, skillData);
-        if(newAchieves == null) {
+        if(newAchieves == null) { // asserts there is a diff (not good design)
             close_connection();
             return null;
         }

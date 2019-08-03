@@ -22,11 +22,25 @@ function checkForInjection(message) {
 	return message.indexOf(';') == -1 ? false : true;
 }
 
+function sleep(ms){
+    return new Promise(resolve=>{
+        setTimeout(resolve,ms)
+    })
+}
+
 // make an announcement for a given time table
 async function makeExpAnnouncement(clanName = 'Sorrow Knights', numTop = 5, time = 'daily', isSplit = false, isSpam = true) {
 	if(numTop > 15) {
         numTop = 15;
-    }
+	}
+	if(time == "weekly") {
+		await sleep(10000);
+	} else if (time == "monthly")
+	{
+		console.log("start");
+		await sleep(30000);
+		console.log("done");
+	}
     let canDo = await annmsg.makeRankAnnouncementMessage('Sorrow Knights', numTop, time, false);
     if(canDo) {
         if(isSpam) {
@@ -67,9 +81,9 @@ var hourly_update = schedule.scheduleJob('30 * * * *', function(){
 			for(name in new99sAnd120s){
 				makeUserSkillAchievementAnnouncement(name, new99sAnd120s[name]);
 			}
-		})
+		});
 	});
-})
+});
 
 // at 0 gmt
 var before_reset_job = schedule.scheduleJob('59 23 * * 7', function() {

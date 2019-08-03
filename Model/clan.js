@@ -121,11 +121,11 @@ async function addNewMembers(clan) {
     var newMembers = members.filter(val => !dbMembers.includes(val));
     var goneMembers = dbMembers.filter(val => !members.includes(val));
 
-    /*
+    // comment this out in a bit
     if(goneMembers.length > 0) {
         db.removeUsers(goneMembers);
     }
-    */
+    
     if(newMembers.length > 0) {
         // for future use
         //let clan_data = await db.getAllUserData();
