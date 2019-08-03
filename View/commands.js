@@ -3,6 +3,8 @@ var clan = require('../Model/clan.js');
 const annmsg = require('./announcementmsg.js');
 var table = require('table').table;
 
+const INVALID_USERNAME = "The username you tried to use could not be found. Use *!myrsn YOUR NAME* to set your username to use commands without a name."
+
 function normalizeCommand(command = "") {
     return command.toLowerCase().substr(1);
 }
@@ -12,7 +14,7 @@ async function handleMax(name) {
         let exptomax = await max.calcExpToMax(name)
         return name + ' has ' + exptomax.toLocaleString() + ' exp left to max.';
     } catch {
-        return 'Invalid username.';
+        return INVALID_USERNAME;
     }
 }
 
@@ -57,14 +59,14 @@ async function handleExp(name, ach_hook_callback) {
             return('Invalid username.');
         }
     } else {
-        return 'Please provide the username you wish to check.';
+        return INVALID_USERNAME;
     }
 }
 
 async function handleCanJoin(name) {
     let text = "";
     if (name == null) {
-        return 'Please provide the username you wish to check.';
+        return INVALID_USERNAME;
     }
 
     try {
@@ -101,13 +103,13 @@ async function handleCanJoin(name) {
         var t = table(res, config);
         return text + '\n' + '```\n' + t + '\n```';
     } catch {
-        return 'Invalid username.';
+        return INVALID_USERNAME;
     };
 }
 
 async function handleClanExp(name) {
     if(name == null) {
-        return 'Please provide the username you wish to check.';
+        return INVALID_USERNAME;
     }
     try {
         let res = await clan.getClanExp(name)
@@ -115,7 +117,7 @@ async function handleClanExp(name) {
             return name + " has gained a total of " + parseInt(res, 10).toLocaleString() + " exp since joining the clan.";
         }
     } catch {
-        return "Failed to find user data. Are they in the clan?"
+        return "Failed to find user data. Are they in the clan? Use *!myrsn YOUR NAME* if you're trying to use this command without specifying a username."
     }
 }
 
