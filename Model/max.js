@@ -118,6 +118,35 @@ async function calcExpToMax(user) {
 	return expRemaining;
 }
 
+async function calcExpToComp(user) {
+	const trueMax = 104273167;
+	const eliteTrueMax = 80618654;
+	let skills = await listSkills(user);
+	var expRemaining = 0;
+	for(var skill in skills) {
+		let exp = skills[skill].xp/10;
+		if(skill == "Invention") {
+			if(exp < eliteTrueMax) {
+				expRemaining += eliteTrueMax - exp;
+			}
+		} else if (skill == "Dungeoneering") {
+			if(exp < trueMax) {
+				expRemaining += trueMax - exp;
+			}
+		} else if (skill == "Slayer") {
+			if(exp < trueMax) {
+				expRemaining += trueMax - exp;
+			}
+		} else {
+			if(exp < exp_cap) {
+				expRemaining += exp_cap - exp;
+			}
+		}
+	}
+
+	return expRemaining;
+}
+
 async function getHiscoreTable(user) {
 	var hiscores = await getHiscoreData(user);
 	var table = [["Skill", "Level", "Exp"]];
@@ -177,6 +206,7 @@ async function test(){
 
 module.exports = {
 	calcExpToMax,
+	calcExpToComp,
 	listSkills,
 	skill_id_lookup,
 	calcCombatLevel,

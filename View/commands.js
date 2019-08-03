@@ -11,8 +11,17 @@ function normalizeCommand(command = "") {
 
 async function handleMax(name) {
     try {
-        let exptomax = await max.calcExpToMax(name)
+        let exptomax = await max.calcExpToMax(name);
         return name + ' has ' + exptomax.toLocaleString() + ' exp left to max.';
+    } catch {
+        return INVALID_USERNAME;
+    }
+}
+
+async function handleComp(name) {
+    try {
+        let exptocomp = await max.calcExpToComp(name);
+        return name + ' has ' + exptocomp.toLocaleString() + ' exp left to true max.';
     } catch {
         return INVALID_USERNAME;
     }
@@ -220,6 +229,8 @@ async function handleResponse(args, command, name, id, ach_hook_callback) {
     command = normalizeCommand(command);
     if        (command === 'max') {
         return await handleMax(name);
+    } else if (command === 'compexp') {
+        return await handleComp(name);
     } else if (command === 'daily'  || 
                command === 'weekly' ||
                command === 'monthly') {
