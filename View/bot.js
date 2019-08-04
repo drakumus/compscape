@@ -187,7 +187,7 @@ if (msg.content[0] === '!') {
 		new Promise(() => {
 			annmsg.makeExpAnnouncementMessage("Sorrow Knights", 5, "event", true).then((res)=>
 			{
-				msg.reply(res);
+				msg.channel.send(res);
 			});
 		});
 	} else if (command.toUpperCase() === '!log'.toUpperCase()) {

@@ -229,7 +229,7 @@ async function handleResponse(args, command, name, id, ach_hook_callback) {
     command = normalizeCommand(command);
     if        (command === 'max') {
         return await handleMax(name);
-    } else if (command === 'compexp') {
+    } else if (command === 'compexp' || command === 'truemax') {
         return await handleComp(name);
     } else if (command === 'daily'  || 
                command === 'weekly' ||
