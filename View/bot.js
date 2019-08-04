@@ -37,9 +37,7 @@ async function makeExpAnnouncement(clanName = 'Sorrow Knights', numTop = 5, time
 		await sleep(10000);
 	} else if (time == "monthly")
 	{
-		console.log("start");
 		await sleep(30000);
-		console.log("done");
 	}
     let canDo = await annmsg.makeRankAnnouncementMessage('Sorrow Knights', numTop, time, false);
     if(canDo) {
@@ -185,7 +183,13 @@ if (msg.content[0] === '!') {
 			}
 		});
 	} else if (command.toUpperCase() === '!leaderboard'.toUpperCase()) {
-		makeExpAnnouncement('Sorrow Knights', 5, 'event', true);
+		//makeExpAnnouncement('Sorrow Knights', 5, 'event', true);
+		new Promise(() => {
+			annmsg.makeExpAnnouncementMessage("Sorrow Knights", 5, "event", true).then((res)=>
+			{
+				msg.reply(res);
+			});
+		});
 	} else if (command.toUpperCase() === '!log'.toUpperCase()) {
 		getName(args, msg.member.user.id).then(name => {
 			if(name != null) {
@@ -317,7 +321,7 @@ if (msg.content[0] === '!') {
 	} else {
 		getName(args, msg.member.user.id).then(name => {
 			commands.handleResponse(args, command, name, msg.member.user.id, makeUserSkillAchievementAnnouncement).then(result => {
-				console.log(result);
+				//console.log(result);
 				if(typeof result === 'object'){
 					msg.channel.send(result.message, {files: result.files});
 				} else if (typeof result != 'undefined') {
