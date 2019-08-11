@@ -255,6 +255,8 @@ async function handleResponse(args, command, name, id, ach_hook_callback) {
         return await handleEPeen(name, ach_hook_callback);
     } else if (command === '7mil') {
         return await handleThresh(7, "weekly");
+    } else if (command === 'skillerz677') {
+        return await handleExp('skillerz677', ach_hook_callback);
     }
 }
 
