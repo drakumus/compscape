@@ -331,10 +331,6 @@ if (msg.content[0] === '!') {
 			});
 		});
 	}
-} else if (msg.member.id == "226227549485662208" || msg.member.id == "223754740582842368"){//"226227549485662208")  {
-	if(/be my player(.*)2/.test(msg.content.toLocaleLowerCase())) {
-		msg.channel.send("No.");
-	}
 }
 });
 
