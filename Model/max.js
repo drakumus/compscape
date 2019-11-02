@@ -49,6 +49,7 @@ async function getUserData(user) {
 	return res;
 }
 
+
 async function getUserPNG(user) {
 	var r = request(`http://secure.runescape.com/m=avatar-rs/${user}/chat.png`, (e, response) => {
 	});
@@ -93,16 +94,37 @@ async function listSkills(user) {
 	return skills;
 }
 
+// this extrapolates the raw skill data of atk, str, and so on from a client query to runescape's runemetric lite endpoint.
+async function extractSkillData(name) { 
+    var raw = await listSkills(name).catch(function (rej) {
+        return {};
+    });
+    var skillData = {};
+    if(raw["Ranged"] != null) {
+        for(var skill in raw) {
+            skillData[skill] = raw[skill].xp/10;
+        }
+    } else {
+        // runemetric profile is not public
+        raw = await getHiscoreData(name).catch(function (rej) {
+            return {};
+        });
+        for(var skill in raw) {
+            skillData[skill] = parseInt(raw[skill].exp, 10);;
+        }
+    }
+    return skillData;
+}
 
 /**
  * Calculates experience remianing for a player to max in runescape 3
  * @param {String} user name of the user to calculate
  */
 async function calcExpToMax(user) {
-	let skills = await listSkills(user);
+	let skills = await extractSkillData(user);
 	var expRemaining = 0;
 	for(var skill in skills) {
-		let exp = skills[skill].xp/10;
+		let exp = skills[skill];
 		if(skill == "Invention") {
 			if(exp < elite_exp_cap) {
 				expRemaining += elite_exp_cap - exp;

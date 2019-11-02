@@ -493,6 +493,17 @@ async function duplicateTable(dupeName = 'daily') {
     close_connection();
 }
 
+async function duplicateTable2(dupeName = 'weekly') {
+    isCon = await init_connection();
+    if(!isCon) return null;
+    
+    await query_db(`DROP TABLE \`${dupeName}\``);
+    await query_db(`CREATE TABLE \`${dupeName}\` LIKE \`daily\``)
+    await query_db(`INSERT \`${dupeName}\` SELECT * FROM \`daily\``); // drop table to make sure it doesn't already exist
+
+    close_connection();
+}
+
 // TEST CASES
 // really just for my sanity not really much in the way of testing
 // will come back to these
