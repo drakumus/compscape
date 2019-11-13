@@ -20,7 +20,7 @@ const ach_hook = new Discord.WebhookClient(secret.ach_hook_id, secret.ach_hook_t
 const client = new Discord.Client();
 
 function checkForInjection(message) {
-	return  !(validator.isAlphanumeric(message));
+	return  !(validator.isAlphanumeric(message.replace(/\s/g, '')));
 	//message.indexOf(';') == -1 ? false : true;
 }
 
