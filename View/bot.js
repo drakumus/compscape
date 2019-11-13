@@ -6,6 +6,7 @@ var scraper = require('../Model/scraper');
 var table = require('table').table;
 var commands = require('./commands.js');
 var annmsg = require('./announcementmsg.js');
+var validator = require('validator');
 var fs = require('fs');
 
 
@@ -19,7 +20,8 @@ const ach_hook = new Discord.WebhookClient(secret.ach_hook_id, secret.ach_hook_t
 const client = new Discord.Client();
 
 function checkForInjection(message) {
-	return message.indexOf(';') == -1 ? false : true;
+	return  !(validator.isAlphanumeric(message));
+	//message.indexOf(';') == -1 ? false : true;
 }
 
 function sleep(ms){
@@ -156,7 +158,7 @@ client.on('message', msg => {
 if (msg.content[0] === '!') {
     var args = msg.content.split(" ");
     var command = args[0];
-	if(checkForInjection(msg.content)) { // have to sanitize my inputs
+	if(checkForInjection(msg.content.substr(1))) { // have to sanitize my inputs
 		msg.reply("Fuck you.");			 // wouldn't want an injection attack now would we :)
 	} else if (command.toUpperCase() === '!rank'.toUpperCase()) {
 		getName(args, msg.member.user.id).then(name => {

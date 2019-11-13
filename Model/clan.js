@@ -122,11 +122,11 @@ async function addNewMembers(clan) {
     var goneMembers = dbMembers.filter(val => !members.includes(val));
 
     // figure out best time to run this. (after name change check/fix?)
-    /*
+    
     if(goneMembers.length > 0) {
         db.removeUsers(goneMembers);
     }
-    */
+    
     if(newMembers.length > 0) {
         // for future use
         //let clan_data = await db.getAllUserData();
