@@ -184,39 +184,6 @@ if (msg.content[0] === '!') {
 				msg.reply('Please provide the username you wish to check.');
 			}
 		});
-	} else if (command.toUpperCase() === '!leaderboard'.toUpperCase()) {
-		//makeExpAnnouncement('Sorrow Knights', 5, 'event', true);
-		new Promise(() => {
-			annmsg.makeExpAnnouncementMessage("Sorrow Knights", 5, "event", true).then((res)=>
-			{
-				msg.channel.send(res);
-			});
-		});
-	} else if (command.toUpperCase() === '!log'.toUpperCase()) {
-		getName(args, msg.member.user.id).then(name => {
-			if(name != null) {
-				console.log(name);
-				max.getALog(name).then(res => {
-					
-					max.getUserPNG(name).then((image_url)=>{
-						let embed = new Discord.RichEmbed()
-						.setTitle(`${name.toLocaleString()}'s Adventure Log`)
-						.setThumbnail(image_url.uri.href)
-						.setColor(0xe500ff);
-	
-						for (var i in res) {
-							let val = res[i];
-							embed.addField(val.date, val.details, false);
-						}
-						msg.channel.send({embed});
-					});
-				}).catch(err => {
-					msg.channel.send("User's profile is either private or username is invalid.")
-				});
-			} else {
-				msg.reply('Please provide the username you wish to check.');
-			}
-		});
 	} else if (command.toUpperCase() === '!ports'.toUpperCase()) {
 		if(args.length > 1) {
 			var timer = "";
@@ -323,10 +290,16 @@ if (msg.content[0] === '!') {
 	} else {
 		getName(args, msg.member.user.id).then(name => {
 			commands.handleResponse(args, command, name, msg.member.user.id, makeUserSkillAchievementAnnouncement).then(result => {
-				//console.log(result);
+				// consider refactoring this
 				if(typeof result === 'object'){
-					msg.channel.send(result.message, {files: result.files});
-				} else if (typeof result != 'undefined') {
+					if (result.embed != null) // if embed
+					{
+						msg.channel.send(result);
+					} else // if epeen
+					{
+						msg.channel.send(result.message, {files: result.files});
+					}
+				} else if (typeof result != 'undefined') { // if text message
 					if (result.length > 0)
 						msg.channel.send(result);
 				}

@@ -2,6 +2,7 @@ const max = require('../Model/max.js');
 var clan = require('../Model/clan.js');
 const annmsg = require('./announcementmsg.js');
 var table = require('table').table;
+const Discord = require('discord.js');
 
 const INVALID_USERNAME = "The username you tried to use could not be found. Use *!myrsn YOUR NAME* to set your username to use commands without a name."
 
@@ -169,14 +170,20 @@ async function handleThresh(thresh = 7, timePeriod = "weekly") {
     thresh = thresh * 1000000;
     let message = ``;
     let count = 1;
+    
     for (i in timedTotal) {
         if(timedTotal[i] > thresh) {
-            message += `${count}. ${i}\n`
+            message += `**${count})** ${i}\n`
             count++;
         }
     }
 
-    return message;
+    let embed = new Discord.RichEmbed()
+    .setTitle(`Clannies with 7 million exp this week:`)
+    .setThumbnail('https://runescape.wiki/images/f/f2/Bond_detail.png?d4bdb')
+    .setColor(0x34eb5b)
+    .setDescription(message);
+    return {embed};
 }
 
 async function handleEPeen(name, ach_hook_callback) {
@@ -225,6 +232,38 @@ async function handleEPeen(name, ach_hook_callback) {
     return {message: message, files: ["./View/epeen.png"]}
 }
 
+async function handleLeaderboard(numTop = 5, isSplit = true) {
+    return await annmsg.makeExpAnnouncementMessage('Sorrow Knights', numTop, "event", isSplit);
+}
+
+async function handleLog(name) {
+    if(name == null) {
+        return "Please set your rsn using the `!myrsn yourname` command or provide the username you wish to check."
+    }
+    let raw_alog;
+    try
+    {
+        raw_alog = await max.getALog(name)
+    } catch {
+        return "User's profile is either private or username is invalid.";
+    }
+					
+    let image_url = await max.getUserPNG(name) 
+    let embed = new Discord.RichEmbed()
+    .setTitle(`${name.toLocaleString()}'s Adventure Log`)
+    .setThumbnail(image_url.uri.href)
+    .setColor(0xe500ff);
+
+    for (var i in raw_alog) {
+        let val = raw_alog[i];
+        embed.addField(val.date, val.details, false);
+    }
+    return {embed};
+    
+        
+    
+}
+
 async function handleResponse(args, command, name, id, ach_hook_callback) {
     command = normalizeCommand(command);
     if        (command === 'max') {
@@ -257,6 +296,11 @@ async function handleResponse(args, command, name, id, ach_hook_callback) {
         return await handleThresh(7, "weekly");
     } else if (command === 'skillerz677') {
         return await handleExp('skillerz677', ach_hook_callback);
+    } else if (command === 'leaderboard') {
+        return await handleLeaderboard(5, true);
+    } else if (command === 'log')
+    {
+        return await handleLog(name);
     }
 }
 
