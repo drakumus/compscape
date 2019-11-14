@@ -143,10 +143,10 @@ async function calcExpToMax(user) {
 async function calcExpToComp(user) {
 	const trueMax = 104273167;
 	const eliteTrueMax = 80618654;
-	let skills = await listSkills(user);
+	let skills = await extractSkillData(user);
 	var expRemaining = 0;
 	for(var skill in skills) {
-		let exp = skills[skill].xp/10;
+		let exp = skills[skill];
 		if(skill == "Invention") {
 			if(exp < eliteTrueMax) {
 				expRemaining += eliteTrueMax - exp;
