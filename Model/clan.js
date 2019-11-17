@@ -226,9 +226,11 @@ function difSkills(skillData1, skillData2) {
 }
 
 async function getUserTable(name, ach_callback) {
-    let userAch = await db.updateExpUser(name, 'experience');
-    if(userAch != null) {
-        ach_callback(name, userAch);
+    let user_data = await db.updateExpUser(name, 'experience');
+    if(user_data != null) {
+        let user_ach = {}
+        user_ach[name] = user_data;
+        ach_callback(user_ach);
     }
     var currentExp = await db.extractSkillDataTable(name, 'experience');
     var dailyExp = await db.extractSkillDataTable(name, 'daily');

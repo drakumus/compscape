@@ -58,19 +58,54 @@ async function makeExpAnnouncement(clanName = 'Sorrow Knights', numTop = 5, time
 	return canDo;
 }
 
-function sendAchHookMessage(message){
-	ach_hook.send(message);
-
-}
-
-function makeUserSkillAchievementAnnouncement(name, new99sAnd120s) {
-	for(let skill in new99sAnd120s['99s']){
-		let skillName = new99sAnd120s['99s'][skill];
-		sendAchHookMessage(annmsg.makeAchAnnouncementMessage(skillName, name, 99));
+// expects 
+/*
+{
+	'Z0CI':
+	{
+		99s:
+		{
+			[0]: "Strength",
+			[1]: "Smithing"
+		}
+		120s: {}
 	}
-	for(let skill in new99sAnd120s['120s']){
-		let skillName = new99sAnd120s['120s'][skill];
-		sendAchHookMessage(annmsg.makeAchAnnouncementMessage(skillName, name, 120));
+	
+}
+*/
+async function makeUserSkillAchievementAnnouncement(new99sAnd120s) {
+	// limit per message is 10
+	
+	let embeds = [];
+	for(name in new99sAnd120s){
+		for(let skill in new99sAnd120s[name]['99s']){
+			let skillName = new99sAnd120s[name]['99s'][skill];
+			embeds.push(annmsg.makeAchAnnouncementMessage(skillName, name, 99));
+		}
+		for(let skill in new99sAnd120s[name]['120s']){
+			let skillName = new99sAnd120s[name]['120s'][skill];
+			embeds.push(annmsg.makeAchAnnouncementMessage(skillName, name, 120));
+		}
+	}
+
+	// send off the message
+	let tenSet = [];
+	let achieves = {};
+	for(var i = 0; i < embeds.length; i++)
+	{
+		tenSet.push(embeds[i]);
+		if((i+1)%10 == 0 && i != 0)
+		{
+			achieves.embeds = tenSet;
+			ach_hook.send(achieves);
+			await sleep(1000); // need to wait for hook to actually send
+			tenSet = [];
+		}
+	}
+	if(embeds.length%10 != 0)
+	{
+		achieves.embeds = tenSet;
+		ach_hook.send(achieves);
 	}
 }
 
@@ -78,9 +113,7 @@ function makeUserSkillAchievementAnnouncement(name, new99sAnd120s) {
 var hourly_update = schedule.scheduleJob('30 * * * *', function(){
 	new Promise(() => {
 		clan.updateClan('Sorrow Knights').then((new99sAnd120s) =>{
-			for(name in new99sAnd120s){
-				makeUserSkillAchievementAnnouncement(name, new99sAnd120s[name]);
-			}
+			makeUserSkillAchievementAnnouncement(new99sAnd120s);
 		});
 	});
 });
