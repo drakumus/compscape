@@ -87,9 +87,13 @@ var hourly_update = schedule.scheduleJob('30 * * * *', function(){
 
 // at 0 gmt
 var before_reset_job = schedule.scheduleJob('59 23 * * 7', function() {
-	commands.handleThresh().then (res => {
+	commands.handleThresh(7, "weekly").then (res => {
 		if(typeof res != "undefined")
+		{
+			res.embeds = [];
+			res.embeds[0] = res.embed;
 			spam_hook.send(res);
+		}
 	});
 });
 
@@ -104,7 +108,11 @@ var daily_job = schedule.scheduleJob('0 0 * * *', function(){
 
 	commands.handleThresh().then (res => {
 		if(typeof res != "undefined")
+		{
+			res.embeds = [];
+			res.embeds[0] = res.embed;
 			spam_hook.send(res);
+		}
 	})
 	// send stuff to discord channel
 });
