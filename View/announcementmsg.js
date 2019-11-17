@@ -167,9 +167,20 @@ function makeAchAnnouncementMessage(skill, name, level) {
 	return embed;
 }
 
+function makeMaxAnnouncementMessage(name)
+{
+	let embed = new Discord.RichEmbed()
+							.setTitle(`${name.toLocaleString()} has achieved at least level 99 in all skills!`)
+							.setThumbnail(resources.skillingIcons["Max Cape"])
+							.setColor(0x03fcfc)
+							.setImage("https://i.imgur.com/s9bPVaK.gif");
+	return embed;
+}
+
 module.exports = {
 	makeExpAnnouncementMessage,
 	makeAchAnnouncementMessage,
 	makeRankAnnouncementMessage,
-	makeEpeenAnnouncementMessage
+	makeEpeenAnnouncementMessage,
+	makeMaxAnnouncementMessage
 }

@@ -73,11 +73,16 @@ async function makeExpAnnouncement(clanName = 'Sorrow Knights', numTop = 5, time
 	
 }
 */
+
 async function makeUserSkillAchievementAnnouncement(new99sAnd120s) {
 	// limit per message is 10
 	
 	let embeds = [];
 	for(name in new99sAnd120s){
+		if(new99sAnd120s[name]['isNewMax'] == true)
+		{
+			embeds.push(annmsg.makeMaxAnnouncementMessage(name));
+		}
 		for(let skill in new99sAnd120s[name]['99s']){
 			let skillName = new99sAnd120s[name]['99s'][skill];
 			embeds.push(annmsg.makeAchAnnouncementMessage(skillName, name, 99));

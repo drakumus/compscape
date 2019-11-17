@@ -329,9 +329,10 @@ async function addExpUsers(names, table = 'experience') {
 // Update the exp for a single user.
 // Potential useful for users that want hourly tracking on skills and potential
 // services built around that. Runemetric endpoing updates amazingly fast, even faster than the actual runemetric site.
-function check99andEqual(old_skill_exp, new_skill_exp){
+function checkSkillThresholds(old_skill_exp, new_skill_exp){
     let new99s = [];
     let new120s = [];
+    let isNewMax = false;
     const LVL_99_INV_EXP = 36073511;
     const LVL_120_INV_EXP = 80618654;
     const LVL_99_EXP = 13034431;
@@ -339,6 +340,10 @@ function check99andEqual(old_skill_exp, new_skill_exp){
     let isDif = false;
     let level99threshold = LVL_99_EXP;
     let level120threshold = LVL_120_EXP;
+    let numNew99s = 0;
+    let numOld99s = 0;
+    
+    let result = {};
     // loop over each skill and compare their old and new exp
     for(let skill in new_skill_exp) {
         // set exp threshold if invention or not.
@@ -355,16 +360,36 @@ function check99andEqual(old_skill_exp, new_skill_exp){
         // check if they're equal. If they break the 99 or 120 threshold
         // log them.
         if(old_exp != new_exp){
-            isDif = true;
             if(old_exp < level99threshold && new_exp >= level99threshold)
+            {
+                isDif = true;
                 new99s.push(skill);
+            }
             if(old_exp < level120threshold && new_exp >= level120threshold)
+            {
+                isDif = true;
                 new120s.push(skill);
+            }
         }
-
+        if(new_exp > level99threshold)
+        {
+            numNew99s++;
+        }
+        if(old_exp > level99threshold)
+        {
+            numOld99s++;
+        }
+    }
+    // update for archaeology!
+    if (numOld99s < 27 && (numNew99s) == 27)
+    {
+        isNewMax = true;
+    } else
+    {
+        isNewMax = false;
     }
     if (isDif)
-        return {"99s": new99s, "120s": new120s};
+        return {"99s": new99s, "120s": new120s, "isNewMax": isNewMax};
     else
         return null;
 }
@@ -377,7 +402,7 @@ async function updateExpUser(name, table = 'experience') {
     var user_id = await getIdUser(name);
     var user_skills = await extractSkillDataTable(name, 'experience');
     if(skillData["Ranged"] != null) {   // when I first wrote this I did skillData == {} which obviously passes. Forgot that === was a thing
-        newAchieves = check99andEqual(user_skills, skillData);
+        newAchieves = checkSkillThresholds(user_skills, skillData);
         if(newAchieves == null) { // asserts there is a diff (not good design)
             close_connection();
             return null;
@@ -407,7 +432,7 @@ async function updateExpUsers(names, table = 'experience') {
         console.log(skillData);
         var user_skills = await extractSkillDataTable(name, 'experience');
         if(skillData["Ranged"] != null) {
-            newAchieves = check99andEqual(user_skills, skillData);
+            newAchieves = checkSkillThresholds(user_skills, skillData);
             if(newAchieves != null) {
                 const output = await query_db(`UPDATE \`${table}\` SET \`attack\` = '${skillData["Attack"]}', \`defence\` = '${skillData["Defence"]}', \`strength\` = '${skillData["Strength"]}', \`constitution\` = '${skillData["Constitution"]}', \`ranged\` = '${skillData["Ranged"]}', \`prayer\` = '${skillData["Prayer"]}', \`magic\` = '${skillData["Magic"]}', \`cooking\` = '${skillData["Cooking"]}', \`woodcutting\` = '${skillData["Woodcutting"]}', \`fletching\` = '${skillData["Fletching"]}', \`fishing\` = '${skillData["Fishing"]}', \`firemaking\` = '${skillData["Firemaking"]}', \`crafting\` = '${skillData["Crafting"]}', \`smithing\` = '${skillData["Smithing"]}', \`mining\` = '${skillData["Mining"]}', \`herblore\` = '${skillData["Herblore"]}', \`agility\` = '${skillData["Agility"]}', \`thieving\` = '${skillData["Thieving"]}', \`slayer\` = '${skillData["Slayer"]}', \`farming\` = '${skillData["Farming"]}', \`runecrafting\` = '${skillData["Runecrafting"]}', \`hunter\` = '${skillData["Hunter"]}', \`construction\` = '${skillData["Construction"]}', \`summoning\` = '${skillData["Summoning"]}', \`dungeoneering\` = '${skillData["Dungeoneering"]}', \`divination\` = '${skillData["Divination"]}', \`invention\` = '${skillData["Invention"]}' WHERE \`experience\`.\`user_id\` = '${user_id}'; `);
                 if(newAchieves["99s"].length != 0 || newAchieves["120s"].length != 0)
