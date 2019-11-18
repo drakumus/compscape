@@ -360,14 +360,13 @@ function checkSkillThresholds(old_skill_exp, new_skill_exp){
         // check if they're equal. If they break the 99 or 120 threshold
         // log them.
         if(old_exp != new_exp){
+            isDif = true;
             if(old_exp < level99threshold && new_exp >= level99threshold)
             {
-                isDif = true;
                 new99s.push(skill);
             }
             if(old_exp < level120threshold && new_exp >= level120threshold)
             {
-                isDif = true;
                 new120s.push(skill);
             }
         }
@@ -429,7 +428,7 @@ async function updateExpUsers(names, table = 'experience') {
     for(var name in ids) {
         var user_id = ids[name];
         var skillData = await extractSkillData(name);
-        console.log(skillData);
+        //console.log(skillData);
         var user_skills = await extractSkillDataTable(name, 'experience');
         if(skillData["Ranged"] != null) {
             newAchieves = checkSkillThresholds(user_skills, skillData);

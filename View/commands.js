@@ -228,7 +228,7 @@ async function handleEPeen(name, ach_hook_callback) {
     message += `**Epeen:**          ${makeEpeen(data.total.userPercentile)}\n`;
     message += `-----------------------------------------***YOUR EXP TOTALS VS CLAN'S!***\n`
     //message += "Below you can see how your exp shapes up against the rest of the clan's!\n"
-    console.log(message);
+    //console.log(message);
     return {message: message, files: ["./View/epeen.png"]}
 }
 
