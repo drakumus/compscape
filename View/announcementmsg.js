@@ -44,7 +44,7 @@ async function makeExpAnnouncementMessage(clanName = 'Sorrow Knights', numTop = 
 		case 'event':
 			announcement = "This event's " + announcement;
 			if(!isSplit)
-				total = await clan.calculateTopExpEvent(clanName, numTop);
+				total = await clan.calculateTopExpEvent(clanName, numTop, "all");
 			else {
 				combat = await clan.calculateTopExpEvent(clanName, numTop, "combat");
 				skilling = await clan.calculateTopExpEvent(clanName, numTop, "skilling");

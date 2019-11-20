@@ -153,14 +153,15 @@ async function addNewMembers(clan) {
  * Calculates the total exp for a single row (user)
  * @param {RowData} rowdata index value of the object returned by the query that performs a left join on the user and an experience table 
  */
-function calculateTotalExp(rowdata) {
+// remove invention from here if it's an event
+function calculateTotalExp(rowdata, excludeInvention = false) {
     var total = 0;
     if(typeof rowdata !== "object") {
         return total;
     }
     for(var i in rowdata) {
         var data = rowdata[i];
-        if(typeof data == "number" && i != 'id' && i != 'user_id') {
+        if(typeof data == "number" && i != 'id' && i != 'user_id' && (i != "invention" || !excludeInvention)) {
             total += data;
         }
     }
@@ -183,8 +184,9 @@ function calculateCombatExp(rowdata) {
     return total;
 }
 
-function calculateSkillingExp(rowdata) {
+function calculateSkillingExp(rowdata, excludeInvention = false) {
     let combat = ['attack', 'strength', 'defence', 'constitution', 'ranged', 'magic', 'slayer', 'prayer', 'summoning', 'invention']
+    if(excludeInvention) combat.pop();
     var total = 0;
     if(typeof rowdata !== "object") {
         return total;
@@ -423,7 +425,7 @@ async function calculateClanAllTimedUserRank(user, clan = "Sorrow Knights", cate
  * @param {String} timeSlot time table you wish to reference: daily, weekly, monthly
  * @param {number} numTop between 1 and # members in the clan
  */
-async function calculateTopExp(clan, timeSlot, numTop, catagory = "all") {
+async function calculateTopExp(clan, timeSlot, numTop, catagory = "all", excludeInvention = false) {
     // find and store the difference between the timed table and the current exp table
     var current_data = timeSlot === "event" ? 
                        await  db.getClanData(clan, "end"):
@@ -434,14 +436,14 @@ async function calculateTopExp(clan, timeSlot, numTop, catagory = "all") {
         var name = timed_data[i].name;
         var currentTotal, timedTotal;
         if(catagory === "all") {
-            currentTotal = calculateTotalExp(current_data[i])
-            timedTotal = calculateTotalExp(timed_data[i]);
+            currentTotal = calculateTotalExp(current_data[i], excludeInvention);
+            timedTotal = calculateTotalExp(timed_data[i], excludeInvention);
         } else if (catagory === "combat") {
-            currentTotal = calculateCombatExp(current_data[i])
+            currentTotal = calculateCombatExp(current_data[i]);
             timedTotal = calculateCombatExp(timed_data[i]);
         } else if (catagory === "skilling") {
-            currentTotal = calculateSkillingExp(current_data[i])
-            timedTotal = calculateSkillingExp(timed_data[i]);
+            currentTotal = calculateSkillingExp(current_data[i], excludeInvention);
+            timedTotal = calculateSkillingExp(timed_data[i], excludeInvention);
         }
         var total = currentTotal - timedTotal;
         if(total > 0 && timedTotal > 0) memberTotals[name] = total;
@@ -530,7 +532,7 @@ async function calculateTopExpMonthly(clan, numTop, type = "all") {
 
 // uses the calculate top method with the event table
 async function calculateTopExpEvent(clan, numTop, type = "all") {
-    const result = await calculateTopExp(clan, 'event', numTop, type);
+    const result = await calculateTopExp(clan, 'event', numTop, type, true);
     return result;
 }
 
