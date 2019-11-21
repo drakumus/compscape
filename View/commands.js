@@ -232,7 +232,7 @@ async function handleEPeen(name, ach_hook_callback) {
     return {message: message, files: ["./View/epeen.png"]}
 }
 
-async function handleLeaderboard(numTop = 5, isSplit = true) {
+async function handleLeaderboard(numTop = 5, isSplit = true, isActiveEvent) {
     return await annmsg.makeExpAnnouncementMessage('Sorrow Knights', numTop, "event", isSplit, isActiveEvent);
 }
 
