@@ -18,6 +18,7 @@ const secret = JSON.parse(fs.readFileSync("./View/secret.json", { encoding: 'utf
 const spam_hook = new Discord.WebhookClient(secret.spam_hook_id,secret.spam_hook_token);
 const ach_hook = new Discord.WebhookClient(secret.ach_hook_id, secret.ach_hook_token);
 const client = new Discord.Client();
+var isActiveEvent = false;
 
 function checkForInjection(message) {
 	//return  !(validator.isAlphanumeric(message.replace(/\s/g, '')));
@@ -209,6 +210,16 @@ if (msg.content[0] === '!') {
 	} else if (command.toUpperCase() === '!rank'.toUpperCase()) {
 		getName(args, msg.member.user.id).then(name => {
 			if(name != null) {
+				clan.getUserRank(name, `Sorrow Knights`, `all`, `event`, isActiveEvent).then(res => {
+					if(Object.keys(res).length > 0) {
+						msg.channel.send("**Total Exp:** Rank " + res.rank + " at " + res.exp.toLocaleString() + " exp.");
+					} else {
+						msg.channel.send("No exp gained during this event.");
+					}
+				}).catch(err => {
+					msg.channel.send("Failed to find user data. Or no exp gained.")
+				});
+				/*
 				clan.getUserRank(name, `Sorrow Knights`, `combat`, `event`).then(res => {
 					if(Object.keys(res).length > 0) {
 						msg.channel.send("**COMBAT:** Rank " + res.rank + " at " + res.exp.toLocaleString() + " exp.");
@@ -226,6 +237,7 @@ if (msg.content[0] === '!') {
 				}).catch(err => {
 					msg.channel.send("Failed to find user data. Or no exp gained.")
 				});
+				*/
 			} else {
 				msg.reply('Please provide the username you wish to check.');
 			}
@@ -246,7 +258,7 @@ if (msg.content[0] === '!') {
 					minutes = minutes.substring(1,minutes.length);
 				}
 				if(hours[0] === '0' && hours.length > 1) {
-					hours = hours.substring(1,minutes.length);
+					hours = hours.substring(1,hours.length);
 				}
 				let time = new Date();
 				time.setHours(time.getHours()+ parseInt(hours));
@@ -279,7 +291,7 @@ if (msg.content[0] === '!') {
 					minutes = minutes.substring(1,minutes.length);
 				}
 				if(hours[0] === '0' && hours.length > 1) {
-					hours = hours.substring(1,minutes.length);
+					hours = hours.substring(1,hours.length);
 				}
 				let time = new Date();
 				time.setHours(time.getHours()+ parseInt(hours));
@@ -287,9 +299,10 @@ if (msg.content[0] === '!') {
 
 				schedule.scheduleJob(time, function(){
 					clan.setEventXp().then(()=>{
-						spam_hook.send(`Double exp has begun! You can now track your exp gains throughout the weekend and compare with your clannies using the commands \`!rank\` and \`!leaderboard\`. Happy Gains!`);
+						spam_hook.send(`Exp tracking for the event has started! Use \`!rank\` and \`!leaderboard\` to check progress. Happy Gains!`);
+						isActiveEvent = true;
 					});
-				})
+				});
 
 				msg.channel.send("The exp table tracking double exp will reset in " + hours + " hour(s) and " + minutes + " minute(s).")
 			} catch (ex) {
@@ -314,7 +327,7 @@ if (msg.content[0] === '!') {
 					minutes = minutes.substring(1,minutes.length);
 				}
 				if(hours[0] === '0' && hours.length > 1) {
-					hours = hours.substring(1,minutes.length);
+					hours = hours.substring(1,hours.length);
 				}
 				let time = new Date();
 				time.setHours(time.getHours()+ parseInt(hours));
@@ -323,6 +336,7 @@ if (msg.content[0] === '!') {
 				schedule.scheduleJob(time, function(){
 					clan.setEventEndXp().then(()=>{
 						spam_hook.send(`Double exp is over! The final exp totals have been saved and the final leaderboard will be updated in a bit. For now it will keep updating with current xp while dev sleeps.`);
+						isActiveEvent = false;
 					});
 				})
 
@@ -335,7 +349,7 @@ if (msg.content[0] === '!') {
 		}
 	} else {
 		getName(args, msg.member.user.id).then(name => {
-			commands.handleResponse(args, command, name, msg.member.user.id, makeUserSkillAchievementAnnouncement).then(result => {
+			commands.handleResponse(args, command, name, msg.member.user.id, makeUserSkillAchievementAnnouncement, isActiveEvent).then(result => {
 				// consider refactoring this
 				if(typeof result === 'object'){
 					if (result.embed != null) // if embed

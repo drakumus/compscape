@@ -425,9 +425,9 @@ async function calculateClanAllTimedUserRank(user, clan = "Sorrow Knights", cate
  * @param {String} timeSlot time table you wish to reference: daily, weekly, monthly
  * @param {number} numTop between 1 and # members in the clan
  */
-async function calculateTopExp(clan, timeSlot, numTop, catagory = "all", excludeInvention = false) {
+async function calculateTopExp(clan, timeSlot, numTop, catagory = "all", excludeInvention = false, isActiveEvent = false) {
     // find and store the difference between the timed table and the current exp table
-    var current_data = timeSlot === "event" ? 
+    var current_data = (timeSlot === "event" && !isActiveEvent) ? 
                        await  db.getClanData(clan, "end"):
                        await db.getClanData(clan);
     var timed_data = await db.getClanData(clan, timeSlot);
@@ -463,9 +463,9 @@ async function calculateTopExp(clan, timeSlot, numTop, catagory = "all", exclude
     return top; // formate {name: String, exp: number}
 }
 
-async function getUserRank(user, clan, catagory = "all", timeSlot) {
+async function getUserRank(user, clan, catagory = "all", timeSlot, isActiveEvent = false) {
     //await db.updateExpUser(user);
-    var current_data = timeSlot === "event" ? 
+    var current_data = (timeSlot === "event" && !isActiveEvent) ? 
                         await  db.getClanData(clan, "end"):
                         await db.getClanData(clan);
     var timed_data = await db.getClanData(clan, timeSlot);

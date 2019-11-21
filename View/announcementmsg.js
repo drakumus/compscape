@@ -9,7 +9,7 @@ var vega = require('vega');
 const resources = JSON.parse(fs.readFileSync("./View/resources.json", {encoding: 'utf8'}));
 
 // make an announcement for a given time table
-async function makeExpAnnouncementMessage(clanName = 'Sorrow Knights', numTop = 5, time = 'daily', isSplit = false) {
+async function makeExpAnnouncementMessage(clanName = 'Sorrow Knights', numTop = 5, time = 'daily', isSplit = false, isActiveEvent = false) {
 	var announcement = `top gains are:`;
 	//await clan.updateClan('Sorrow Knights');
 	var total, combat, skilling;
@@ -44,10 +44,10 @@ async function makeExpAnnouncementMessage(clanName = 'Sorrow Knights', numTop = 
 		case 'event':
 			announcement = "This event's " + announcement;
 			if(!isSplit)
-				total = await clan.calculateTopExpEvent(clanName, numTop, "all");
+				total = await clan.calculateTopExpEvent(clanName, numTop, "all", isActiveEvent);
 			else {
-				combat = await clan.calculateTopExpEvent(clanName, numTop, "combat");
-				skilling = await clan.calculateTopExpEvent(clanName, numTop, "skilling");
+				combat = await clan.calculateTopExpEvent(clanName, numTop, "combat", isActiveEvent);
+				skilling = await clan.calculateTopExpEvent(clanName, numTop, "skilling", isActiveEvent);
 			}
 			break;
 

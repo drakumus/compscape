@@ -233,7 +233,7 @@ async function handleEPeen(name, ach_hook_callback) {
 }
 
 async function handleLeaderboard(numTop = 5, isSplit = true) {
-    return await annmsg.makeExpAnnouncementMessage('Sorrow Knights', numTop, "event", isSplit);
+    return await annmsg.makeExpAnnouncementMessage('Sorrow Knights', numTop, "event", isSplit, isActiveEvent);
 }
 
 async function handleLog(name) {
@@ -261,7 +261,7 @@ async function handleLog(name) {
     return {embed};
 }
 
-async function handleResponse(args, command, name, id, ach_hook_callback) {
+async function handleResponse(args, command, name, id, ach_hook_callback, isActiveEvent = false) {
     command = normalizeCommand(command);
     if        (command === 'max') {
         return await handleMax(name);
@@ -294,7 +294,7 @@ async function handleResponse(args, command, name, id, ach_hook_callback) {
     } else if (command === 'skillerz677') {
         return await handleExp('skillerz677', ach_hook_callback);
     } else if (command === 'leaderboard' || command === 'leaderboards') {
-        return await handleLeaderboard(5, false);
+        return await handleLeaderboard(5, false, isActiveEvent);
     } else if (command === 'log')
     {
         return await handleLog(name);
