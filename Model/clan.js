@@ -427,8 +427,8 @@ async function calculateClanAllTimedUserRank(user, clan = "Sorrow Knights", cate
  */
 async function calculateTopExp(clan, timeSlot, numTop, catagory = "all", excludeInvention = false, isActiveEvent = false) {
     // find and store the difference between the timed table and the current exp table
-    var current_data = //(timeSlot === "event" && !isActiveEvent) ? 
-                       //await  db.getClanData(clan, "end"):
+    var current_data = timeSlot === "event" ?  // && !isActiveEvent
+                       await  db.getClanData(clan, "end"):
                        await db.getClanData(clan);
     var timed_data = await db.getClanData(clan, timeSlot);
     var memberTotals = {}; // where the fuck did the rest go?
