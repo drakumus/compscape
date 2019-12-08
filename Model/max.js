@@ -144,29 +144,32 @@ async function calcExpToComp(user) {
 	const trueMax = 104273167;
 	const eliteTrueMax = 80618654;
 	let skills = await extractSkillData(user);
-	var expRemaining = 0;
-	for(var skill in skills) {
+	var totalRemainingExp = 0;
+	let trueMaxSkillsLeft = {}
+
+	let skills120 = ["Invention", "Dungeoneering", "Slayer", "Farming", "Herblore"];
+	for( var skill in skills ) {
+		let cap = exp_cap;
 		let exp = skills[skill];
-		if(skill == "Invention") {
-			if(exp < eliteTrueMax) {
-				expRemaining += eliteTrueMax - exp;
+		let remainingExp = 0;
+		if( skills120.includes(skill) ) {
+			cap = trueMax;
+			if(skill === "Invention") {
+				cap = eliteTrueMax;
 			}
-		} else if (skill == "Dungeoneering") {
-			if(exp < trueMax) {
-				expRemaining += trueMax - exp;
-			}
-		} else if (skill == "Slayer") {
-			if(exp < trueMax) {
-				expRemaining += trueMax - exp;
-			}
-		} else {
-			if(exp < exp_cap) {
-				expRemaining += exp_cap - exp;
-			}
+		}
+		remainingExp = cap - exp;
+
+		if( remainingExp > 0)
+		{
+			trueMaxSkillsLeft[skill] = remainingExp;
+			totalRemainingExp += remainingExp;
 		}
 	}
 
-	return expRemaining;
+	trueMaxSkillsLeft["Total"] = totalRemainingExp;
+	
+	return trueMaxSkillsLeft;
 }
 
 async function getHiscoreTable(user) {

@@ -21,12 +21,19 @@ async function handleMax(name) {
 
 async function handleComp(name) {
     try {
-        let exptocomp = await max.calcExpToComp(name);
-        return name + ' has ' + exptocomp.toLocaleString() + ' exp left to true max.';
+        let message = "__**" + name + "'s Exp Remaining to True Max**__\n"
+        let expRemaining = await max.calcExpToComp(name);
+        for( var skill in expRemaining ) 
+        {   
+            message += "**" + skill + ":** " + expRemaining[skill].toLocaleString() + "\n";
+        }
+        return message;
+        //return name + ' has ' + exptocomp.toLocaleString() + ' exp left to true max.';
     } catch {
         return INVALID_USERNAME;
     }
 }
+
 
 async function handleTimeRank(time = 'daily') {
     try {
