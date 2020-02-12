@@ -418,6 +418,57 @@ async function calculateClanAllTimedUserRank(user, clan = "Sorrow Knights", cate
     return result;
 }
 
+async function getTopSkillExp(skill, timedTable = 'experience', numTop = 3) {
+    let expRes = await db.getSkillData(skill, 'experience');
+    let timedRes = await db.getSkillData(skill, timedTable);
+
+    let data = [];
+    for ( let i = 0; i < timedRes.length; i++)
+    {
+        let obj = {};
+        obj[timedRes[i].Name] = expRes[i][skill] - timedRes[i][skill];
+
+        data.push(obj);
+    }
+
+    // sort the list until the top x players have been found
+    var top = [];
+    for(var i = 0; i < numTop; i++) {
+        var largest = Object.keys(data)[0];
+        for(var p in data) {
+            if(data[p] > data[largest]) largest = p;
+        }
+        top.push({name: largest, exp: data[largest]});
+        delete data[largest];
+    }
+
+    return top;
+}
+
+async function getFormattedTopSkillExp(skill, timedTable = 'experience', numTop = 3) {
+    let expRes = await db.getSkillData(skill, 'experience');
+    let timedRes = await db.getSkillData(skill, timedTable);
+
+    let data = {};
+    for ( let i = 0; i < timedRes.length; i++)
+    {
+        data[timedRes[i].name] = expRes[i][skill] - timedRes[i][skill];
+    }
+
+    // sort the list until the top x players have been found
+    var top = [];
+    for(var i = 0; i < numTop; i++) {
+        var largest = Object.keys(data)[0];
+        for(var p in data) {
+            if(data[p] > data[largest]) largest = p;
+        }
+        top.push({x: largest, y: data[largest]});
+        delete data[largest];
+    }
+
+    return top;
+}
+
 /**
  * Performs a dif on the total exp for the experience table and a given time table (daily, weekly, monthly).
  * The dif list is then sorted and the numTop users are presented.
@@ -602,5 +653,7 @@ module.exports = {
     getUserRSN,
     setUserRSN,
     calculateClanAllTimedUserRank,
-    calculateClanTimedTotalExp
+    calculateClanTimedTotalExp,
+    getTopSkillExp,
+    getFormattedTopSkillExp
 }

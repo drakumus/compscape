@@ -5,6 +5,7 @@ const fs = require('fs');
 //require('./GraphicSpecs/rankBar.json');
 var rankConfig = require('./GraphicSpecs/rankPie.json');
 var epeenConfig = require('./GraphicSpecs/epeenPie.json');
+var compConfig = require('./GraphicSpecs/compBar.json');
 var vega = require('vega');
 const resources = JSON.parse(fs.readFileSync("./View/resources.json", {encoding: 'utf8'}));
 
@@ -159,6 +160,50 @@ async function makeEpeenAnnouncementMessage(user, clanName = 'Sorrow Knights') {
 	return !result? false: data;
 }
 
+async function makeCompetitionMessage(skill = "fishing")
+{
+	var d = new Date();
+	var month = new Array();
+	month[0] = "January";
+	month[1] = "February";
+	month[2] = "March";
+	month[3] = "April";
+	month[4] = "May";
+	month[5] = "June";
+	month[6] = "July";
+	month[7] = "August";
+	month[8] = "September";
+	month[9] = "October";
+	month[10] = "November";
+	month[11] = "December";
+	var sMonth = month[d.getMonth()];
+
+	let data = await clan.getFormattedTopSkillExp(skill, 'monthly');
+	// {name1: exp, name2: exp}
+	compConfig.title.text = (`Top ${skill} gains ${sMonth}`).toUpperCase();
+	compConfig.data[0].values = data
+	var view = new vega
+	.View(vega.parse(compConfig))
+	.renderer('none')
+	.initialize();
+
+	// generate static PNG file from chart
+	let canvas = await view.toCanvas()
+	// process node-canvas instance for example, generate a PNG stream to write var
+	const stream = canvas.createPNGStream();
+	const out = fs.createWriteStream(__dirname + '/skill.png');
+	console.log('Writing PNG to file...');
+	stream.pipe(out);
+	let result = await new Promise((res, rej) => {
+		try {
+			out.on('finish', () => {res(true)});
+		} catch {
+			rej(false);
+		}
+	});
+	return !result? false: true;
+}
+
 function makeAchAnnouncementMessage(skill, name, level) {
 	let embed = new Discord.RichEmbed()
 							.setTitle(`${name.toLocaleString()} has achieved level ${level} in ${skill.toLowerCase()}!`)
@@ -182,5 +227,6 @@ module.exports = {
 	makeAchAnnouncementMessage,
 	makeRankAnnouncementMessage,
 	makeEpeenAnnouncementMessage,
-	makeMaxAnnouncementMessage
+	makeMaxAnnouncementMessage,
+	makeCompetitionMessage
 }

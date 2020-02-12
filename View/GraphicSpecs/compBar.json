@@ -1,0 +1,80 @@
+{
+    "$schema": "https://vega.github.io/schema/vega/v3.0.json",
+    "width": 600,
+    "height": 300,
+    "padding": 5,
+    "title": {
+        "text": "Test",
+        "fontSize": 20,
+        "color": "aliceblue"
+    },
+    "data": [
+      {
+        "name": "table",
+        "values": [{"x":"a", "y":10},
+                   {"x":"b", "y":11}],
+        "transform": [
+          {
+            "type": "stack",
+            "groupby": ["x"],
+            "field": "y"
+          }
+        ]
+      }
+    ],
+    "scales": [
+      {
+        "name": "x",
+        "type": "band",
+        "range": "width",
+        "domain": {"data": "table", "field": "x"},
+        "padding": 0.02
+      },
+      {
+        "name": "y",
+        "type": "linear",
+        "range": "height",
+        "nice": true, "zero": true,
+        "domain": {"data": "table", "field": "y1"}
+      }
+    ],
+  
+    "axes": [
+      {"orient": "bottom", "scale": "x", "zindex": 1,"labelFontSize": 20,"labelColor":"aliceblue"},
+      {"orient": "left", "scale": "y", "zindex": 1,"labelFontSize": 20,"labelColor":"aliceblue"}
+    ],
+  
+    "marks": [
+      {
+        "type": "rect",
+        "from": {"data": "table"},
+        "encode": {
+          "enter": {
+            "x": {"scale": "x", "field": "x"},
+            "width": {"scale": "x", "band": 1, "offset": -1},
+            "y": {"scale": "y", "field": "y0"},
+            "y2": {"scale": "y", "field": "y1"}
+          },
+          "update": {
+            "fillOpacity": {"value": 1}
+          },
+          "hover": {
+            "fillOpacity": {"value": 0.5}
+          }
+        }
+      }
+    ],
+    "layer": [{
+        "mark": "bar"
+    }, {
+        "type": "text",
+        "align": "top",
+        "baseline": "middle",
+        "fontSize": 20,
+        "color":"aliceblue",
+        "dx": 2,
+        "encode": {
+            "text": {"field": "y", "type": "quantitative"}
+        }
+    }]
+  }

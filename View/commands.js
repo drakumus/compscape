@@ -268,6 +268,16 @@ async function handleLog(name) {
     return {embed};
 }
 
+async function handleExpComp(skill = "fishing")
+{
+    let canDo = await annmsg.makeCompetitionMessage(skill);
+    if(canDo) {
+        return {files: ["./View/skill.png"]}
+    } else {
+        return "Could not make image, probably not enough data yet."
+    }
+}
+
 async function handleResponse(args, command, name, id, ach_hook_callback, isActiveEvent = false) {
     command = normalizeCommand(command);
     if        (command === 'max') {
@@ -305,6 +315,14 @@ async function handleResponse(args, command, name, id, ach_hook_callback, isActi
     } else if (command === 'log')
     {
         return await handleLog(name);
+    } else if (command === 'skilling')
+    {
+        if(args.length > 1){
+            return await handleExpComp(args[1]);
+        } else {
+            return await handleExpComp();
+        }
+        
     }
 }
 

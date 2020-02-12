@@ -34,7 +34,10 @@ async function init_connection(){
 
     let p = new Promise((res,rej) => {
         connection.connect(function(err) {
-            if(err) res(false);
+            if(err) {
+                console.log(err);
+                res(false);
+            }
             res(true);
         });
     });
@@ -106,6 +109,16 @@ async function updateDiscordUser(id, rsn) {
     if(!isCon) return null;
 
     const raw = await query_db(`UPDATE \`discord_user\` SET \`rsn\` = '${rsn}' WHERE \`discord_user\`.\`id\` = ${id}`);
+    close_connection();
+
+    return raw;
+}
+
+async function getSkillData(skill, table = 'experience') {
+    isCon = await init_connection();
+    if(!isCon) return null;
+
+    const raw = await query_db(`SELECT \`name\`,\`${skill}\` FROM user LEFT JOIN ${table} ON user.id = ${table}.user_id`);
     close_connection();
 
     return raw;
@@ -609,5 +622,6 @@ module.exports = {
     extractSkillDataTable,
     getDiscordUser,
     updateDiscordUser,
-    addDiscordUser
+    addDiscordUser,
+    getSkillData
 }
