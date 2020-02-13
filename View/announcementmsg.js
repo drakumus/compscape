@@ -160,8 +160,11 @@ async function makeEpeenAnnouncementMessage(user, clanName = 'Sorrow Knights') {
 	return !result? false: data;
 }
 
+makeCompetitionMessage("defence");
+
 async function makeCompetitionMessage(skill = "fishing")
 {
+	skill = skill.toLowerCase();
 	var d = new Date();
 	var month = new Array();
 	month[0] = "January";
@@ -181,7 +184,8 @@ async function makeCompetitionMessage(skill = "fishing")
 	let data = await clan.getFormattedTopSkillExp(skill, 'monthly');
 	// {name1: exp, name2: exp}
 	compConfig.title.text = (`Top ${skill} gains ${sMonth}`).toUpperCase();
-	compConfig.data[0].values = data
+	compConfig.data[0].values = data;
+	compConfig.marks[0].encode.update.fill.value = resources.skillColors[skill];
 	var view = new vega
 	.View(vega.parse(compConfig))
 	.renderer('none')

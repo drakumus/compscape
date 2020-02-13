@@ -2,7 +2,7 @@
     "skillingIcons": {
         "attack": "https://runescape.wiki/images/thumb/5/51/Attack-icon.png/21px-Attack-icon.png",
         "strength": "https://runescape.wiki/images/thumb/3/3e/Strength-icon.png/16px-Strength-icon.png",
-        "defense": "https://runescape.wiki/images/thumb/d/d8/Defence-icon.png/18px-Defence-icon.png",
+        "defence": "https://runescape.wiki/images/thumb/d/d8/Defence-icon.png/18px-Defence-icon.png",
         "ranged": "https://runescape.wiki/images/thumb/7/72/Ranged-icon.png/21px-Ranged-icon.png",
         "prayer": "https://runescape.wiki/images/2/24/Prayer-icon.png",
         "magic": "https://runescape.wiki/images/thumb/7/77/Magic-icon.png/21px-Magic-icon.png",
@@ -28,5 +28,34 @@
         "divination": "https://runescape.wiki/images/thumb/c/c3/Divination-icon.png/21px-Divination-icon.png",
         "invention": "https://runescape.wiki/images/thumb/1/1f/Invention-icon.png/17px-Invention-icon.png",
         "Max Cape": "https://runescape.wiki/images/archive/2/29/20190405152954%21Max_cape.png"
+    },
+    "skillColors": {
+        "agility": "#130F31",
+        "attack": "#350D0A",
+        "constitution": "#8B887F or 68665F",
+        "construction": "#4B4639",
+        "cooking": "#301036",
+        "crafting": "#34291B",
+        "defence": "#30365D",
+        "divination": "#251545",
+        "dungeoneering": "#5A2A00",
+        "farming": "#102713",
+        "firemaking": "#663A09",
+        "fishing": "#364655",
+        "fletching": "#032227",
+        "herblore": "#032804",
+        "hunter": "#32311F",
+        "invention": "#B59225",
+        "magic": "#151646",
+        "mining": "#2B382B",
+        "prayer": "#c9d3d9",
+        "ranged": "#26360A",
+        "runecrafting": "#726230",
+        "slayer": "#000000",
+        "smithing": "#323233",
+        "strength": "#053B24",
+        "summoning": "#323B3F",
+        "thieving": "#2E1825",
+        "woodcutting": "#1C4526"
     }
 }

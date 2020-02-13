@@ -50,16 +50,14 @@
         "from": {"data": "table"},
         "encode": {
           "enter": {
+            "cornerRadius": 20,
             "x": {"scale": "x", "field": "x"},
             "width": {"scale": "x", "band": 1, "offset": -1},
             "y": {"scale": "y", "field": "y0"},
             "y2": {"scale": "y", "field": "y1"}
           },
           "update": {
-            "fillOpacity": {"value": 1}
-          },
-          "hover": {
-            "fillOpacity": {"value": 0.5}
+            "fill": {"value": "white"}
           }
         }
       }
@@ -74,7 +72,7 @@
         "color":"aliceblue",
         "dx": 2,
         "encode": {
-            "text": {"field": "y", "type": "quantitative"}
+          "text": {"field": "y", "type": "quantitative"}
         }
     }]
   }
