@@ -199,18 +199,22 @@ async function handleActive( timePeriod = "weekly") {
     let message = ``;
     let count = 1;
     
+    let names = [];
+
     for (i in timedTotal) {
         if(timedTotal[i] > thresh) {
-            message += `**${count})** ${i}\n`
-            count++;
+            names.push(i);
         }
     }
 
+    let winner = names[Math.floor(Math.random()*names.length)];
+
+    
     let embed = new Discord.RichEmbed()
-    .setTitle(`Clannies with at least 1 exp this week:`)
+    .setTitle(`Winner for random active clannie:`)
     .setThumbnail('https://runescape.wiki/images/b/bc/XP_Counter_icon.png')
     .setColor(0xfbff00)
-    .setDescription(message);
+    .setDescription(winner);
     return {embed};
 }
 
@@ -344,7 +348,7 @@ async function handleResponse(args, command, name, id, ach_hook_callback, isActi
             return await handleExpComp();
         }
         
-    } else if (command === 'makkas' || command === 'active')
+    } else if (command === 'makas' || command === 'activewinner')
     {
         return await handleActive("weekly");
     }

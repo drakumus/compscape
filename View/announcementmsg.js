@@ -160,8 +160,6 @@ async function makeEpeenAnnouncementMessage(user, clanName = 'Sorrow Knights') {
 	return !result? false: data;
 }
 
-makeCompetitionMessage("defence");
-
 async function makeCompetitionMessage(skill = "fishing")
 {
 	skill = skill.toLowerCase();
