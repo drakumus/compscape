@@ -193,6 +193,27 @@ async function handleThresh(thresh = 7, timePeriod = "weekly") {
     return {embed};
 }
 
+async function handleActive( timePeriod = "weekly") {
+    let timedTotal = await clan.calculateClanTimedTotalExp('Sorrow Knights', timePeriod, "all");
+    thresh = 1;
+    let message = ``;
+    let count = 1;
+    
+    for (i in timedTotal) {
+        if(timedTotal[i] > thresh) {
+            message += `**${count})** ${i}\n`
+            count++;
+        }
+    }
+
+    let embed = new Discord.RichEmbed()
+    .setTitle(`Clannies with at least 1 exp this week:`)
+    .setThumbnail('https://runescape.wiki/images/b/bc/XP_Counter_icon.png')
+    .setColor(0xfbff00)
+    .setDescription(message);
+    return {embed};
+}
+
 async function handleEPeen(name, ach_hook_callback) {
     let exptable = await clan.getUserTable(name, ach_hook_callback);
     if(name == null) {
@@ -323,6 +344,9 @@ async function handleResponse(args, command, name, id, ach_hook_callback, isActi
             return await handleExpComp();
         }
         
+    } else if (command === 'makkas' || command === 'active')
+    {
+        return await handleActive("weekly");
     }
 }
 
