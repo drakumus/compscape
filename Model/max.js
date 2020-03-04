@@ -184,7 +184,7 @@ async function getHiscoreTable(user) {
 async function canTheyJoinTheClan(user) {
 	var hiscores = await getHiscoreData(user);
 	var combat = await calcCombatLevel(user);
-	if(hiscores.Total.level >= 1750 || combat >= 115)
+	if(hiscores.Total.level >= 2100 || combat >= 130)
 		return {"canjoin": true, "combat": combat, "total": hiscores.Total.level};
 	/*
 	for(var skill in hiscores) {
