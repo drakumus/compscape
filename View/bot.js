@@ -59,6 +59,17 @@ async function makeExpAnnouncement(clanName = 'Sorrow Knights', numTop = 5, time
 	return canDo;
 }
 
+async function sendSpam(text)
+{
+	spam_hook.send(text);
+}
+
+let callbacks =
+{
+	"achieves": makeUserSkillAchievementAnnouncement,
+	"spam": sendSpam
+}
+
 // expects 
 /*
 {
@@ -77,7 +88,7 @@ async function makeExpAnnouncement(clanName = 'Sorrow Knights', numTop = 5, time
 
 async function makeUserSkillAchievementAnnouncement(new99sAnd120s) {
 	// limit per message is 10
-	
+
 	let embeds = [];
 	for(name in new99sAnd120s){
 		if(new99sAnd120s[name]['isNewMax'] == true)
@@ -183,10 +194,10 @@ var prif_job = schedule.scheduleJob('1 * * * *', function(){
 
 async function getName(args, id) {
 	var name = null;
-	if(args.length >= 2) {
+	if(args.length >= 1) {
 		// concatenate the username args
 		name = "";
-		for(var i = 1; i < args.length; i++) {
+		for(var i = 0; i < args.length; i++) {
 			name += args[i];
 			if(i != args.length-1) name += " ";
 		}
@@ -204,7 +215,7 @@ client.on('ready', () => {
 client.on('message', msg => {
 if (msg.content[0] === '!') {
     var args = msg.content.split(" ");
-    var command = args[0];
+    var command = args.shift();
 	if(checkForInjection(msg.content.substr(1))) { // have to sanitize my inputs
 		msg.reply("Fuck you.");			 // wouldn't want an injection attack now would we :)
 	} else if (command.toUpperCase() === '!rank'.toUpperCase()) {
@@ -243,9 +254,9 @@ if (msg.content[0] === '!') {
 			}
 		});
 	} else if (command.toUpperCase() === '!ports'.toUpperCase()) {
-		if(args.length > 1) {
+		if(args.length > 0) {
 			var timer = "";
-			for(var i = 1; i < args.length; i++) {
+			for(var i = 0; i < args.length; i++) {
 				timer += args[i];
 				if(i != args.length-1) name += " ";
 			}
@@ -276,9 +287,9 @@ if (msg.content[0] === '!') {
 			msg.channel.send("Missing time argument");
 		}
 	} else if (command.toUpperCase() === '!startEvent'.toUpperCase() && msg.member.user.id === "135244717901348864") {
-		if(args.length > 1) {
+		if(args.length > 0) {
 			var timer = "";
-			for(var i = 1; i < args.length; i++) {
+			for(var i = 0; i < args.length; i++) {
 				timer += args[i];
 				if(i != args.length-1) name += " ";
 			}
@@ -312,9 +323,9 @@ if (msg.content[0] === '!') {
 			msg.channel.send("Missing time argument");
 		}
 	} else if (command.toUpperCase() === '!endEvent'.toUpperCase() && msg.member.user.id === "135244717901348864") {
-		if(args.length > 1) {
+		if(args.length > 0) {
 			var timer = "";
-			for(var i = 1; i < args.length; i++) {
+			for(var i = 0; i < args.length; i++) {
 				timer += args[i];
 				if(i != args.length-1) name += " ";
 			}
@@ -349,7 +360,7 @@ if (msg.content[0] === '!') {
 		}
 	} else {
 		getName(args, msg.member.user.id).then(name => {
-			commands.handleResponse(args, command, name, msg.member.user.id, makeUserSkillAchievementAnnouncement, isActiveEvent).then(result => {
+			commands.handleResponse(args, command, msg.content, name, msg.member.user.id, callbacks, isActiveEvent).then(result => {
 				// consider refactoring this
 				if(typeof result === 'object'){
 					if (result.embed != null) // if embed

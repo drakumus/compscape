@@ -124,6 +124,79 @@ async function handleCanJoin(name) {
     };
 }
 
+async function handleCanTheyJoin(command, raw, sendSpam) {
+    let text = "";
+    let response = "";
+    if (raw.length <= command.length+1) {
+        return "Must include names seperated by commas i.e. \`!cantheyjoin name 1, name 2, name 3\`"
+    }
+    let rawNames = raw.substring(command.length+2); // +2 to include ! at start and space after
+    let unclean_names = rawNames.split(",");
+    let names = [];
+    for(let i = 0; i < unclean_names.length; i++) {
+        names.push(unclean_names[i].trim());
+    }
+
+    if (names.length == 0) {
+        return "Not enough names.";
+    } else if (names.length > 6)
+    {
+        return "A maximum of 6 names can be checked."
+    }
+
+    for(var i = 0; i < names.length; i++)
+    {
+        let name = names[i];
+        try {
+            let result = await max.canTheyJoinTheClan(name);
+            if(result.canjoin) {
+                text = name + " is eligible to join the clan!\n" +
+                "**combat:**      " + result.combat.toFixed(2) + "\n" + 
+                "**total level:** " + result.total;
+            } else {
+                text = "Unfortunately, " + name + " does not meet the minimum requirements to join the clan.\n" +
+                "**combat:**      " + result.combat.toFixed(2) + "\n" + 
+                "**total level:** " + result.total;
+            }
+            let res = await max.getHiscoreTable(name);
+            var config = {
+                drawHorizontalLine: (index, size) => {
+                    return index === 0 || index === 1 || index === size;
+                },
+                columns: {
+                    0: {
+                        alignment: 'left',
+                        minWidth: 5
+                    },
+                    1: {
+                        alignment: 'right',
+                        minWidth: 5
+                    },
+                    2: {
+                        alignment: 'right',
+                        minWidth: 5
+                    }
+                }
+            };
+            var t = table(res, config);
+            text = text + '\n' + '```\n' + t + '\n```';
+            text += "<------------------------------------------------->\n"
+            if(i == 0) { response = text; }
+            else { await sendSpam(text); }
+        } catch {
+            response = `<------------------------------------------------->\n`;
+            response += `${name} could not be found in hiscores.\n`;
+            response += `<------------------------------------------------->\n`; 
+            if(i == 0) { 
+                response = text;
+            }
+            else { 
+                await sendSpam(text); }
+        };
+    }
+    return response;
+}
+
 async function handleClanExp(name) {
     if(name == null) {
         return INVALID_USERNAME;
@@ -303,7 +376,7 @@ async function handleExpComp(skill = "fishing")
     }
 }
 
-async function handleResponse(args, command, name, id, ach_hook_callback, isActiveEvent = false) {
+async function handleResponse(args, command, raw, name, id, callbacks, isActiveEvent = false) {
     command = normalizeCommand(command);
     if        (command === 'max') {
         return await handleMax(name);
@@ -314,9 +387,11 @@ async function handleResponse(args, command, name, id, ach_hook_callback, isActi
                command === 'monthly') {
         return await handleTimeRank(command);
     } else if (command === 'exp') {
-        return await handleExp(name, ach_hook_callback);
+        return await handleExp(name, callbacks.achieves);
     } else if (command === 'canjoin') {
         return await handleCanJoin(name);
+    } else if (command === 'cantheyjoin') {
+        return await handleCanTheyJoin(command, raw, callbacks.spam);
     } else if (command === 'clanexp') {
         return await handleClanExp(name);
     } else if (command === 'myrsn') {
@@ -324,17 +399,17 @@ async function handleResponse(args, command, name, id, ach_hook_callback, isActi
     } else if (command === 'gdaily'  || 
                command === 'gweekly' ||
                command === 'gmonthly') {
-        if(args.length > 1) {
-            if(!isNaN(args[1]))
-                return await handleGTime(command.substr(1), parseInt(args[1]));
+        if(args.length > 0) {
+            if(!isNaN(args[0]))
+                return await handleGTime(command.substr(1), parseInt(args[0]));
         }
         return await handleGTime(command.substr(1))
     } else if (command === 'epeen') {
-        return await handleEPeen(name, ach_hook_callback);
+        return await handleEPeen(name, callbacks.achieves);
     } else if (command === '7mil') {
         return await handleThresh(7, "weekly");
     } else if (command === 'skillerz677') {
-        return await handleExp('skillerz677', ach_hook_callback);
+        return await handleExp('skillerz677', callbacks.achieves);
     } else if (command === 'leaderboard' || command === 'leaderboards') {
         return await handleLeaderboard(10, false, isActiveEvent);
     } else if (command === 'log')
@@ -342,8 +417,8 @@ async function handleResponse(args, command, name, id, ach_hook_callback, isActi
         return await handleLog(name);
     } else if (command === 'skilling')
     {
-        if(args.length > 1){
-            return await handleExpComp(args[1]);
+        if(args.length > 0){
+            return await handleExpComp(args[0]);
         } else {
             return await handleExpComp();
         }
