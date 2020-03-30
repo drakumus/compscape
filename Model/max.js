@@ -50,9 +50,9 @@ function getLevelFromExp(exp = 0)
 		return 1;
 	}
 
-	for (lvl = 1; lvl <= maxlevel; lvl++)
+	for (let lvl = 1; lvl <= maxlevel; lvl++)
 	{
-		points += Math.floor(lvl + 300 * Math.pow(2, lvl / 7.));
+		points += Math.floor(lvl + 300 * Math.pow(2, (lvl-1) / 7.));
 		level_exp = Math.floor(points / 4);
 
 		if((level_exp-1) > exp) // -1 so if someone has exact lvl exp it isnt counted as next level
@@ -61,6 +61,8 @@ function getLevelFromExp(exp = 0)
 		}
 	}
 }
+
+console.log(getLevelFromExp(96015))
 
 /**
  * Gets the user's data from the runemetric endpoint

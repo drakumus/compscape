@@ -382,7 +382,7 @@ async function handleArchLeaderboard()
     let data = await clan.getFormattedTopSkillExp("archaeology", "experience", 25);
     for(let i = 0; i < data.length; i++)
     {
-        msg += `${i+1}) **${data[i].x}**\tLevel: ${max.getLevelFromExp(data[i].y)}\tExp: ${data[i].y}\n`;
+        msg += `${i+1})\t**${data[i].x}**\tLevel: ${max.getLevelFromExp(data[i].y)}\tExp: ${data[i].y}\n`;
     }
     return msg;
 }
