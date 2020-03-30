@@ -458,7 +458,13 @@ async function getFormattedTopSkillExp(skill, timedTable = 'experience', numTop 
     let data = {};
     for ( let i = 0; i < timedRes.length; i++)
     {
-        data[timedRes[i].name] = expRes[i][skill] - timedRes[i][skill];
+        if(timedTable == 'experience') // total exp
+        {
+            data[timedRes[i].name] = expRes[i][skill];
+        } else
+        {
+            data[timedRes[i].name] = expRes[i][skill] - timedRes[i][skill];
+        }
     }
 
     // sort the list until the top x players have been found
