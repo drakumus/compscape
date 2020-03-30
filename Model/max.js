@@ -29,7 +29,8 @@ const skill_id_lookup = {
 	23:	"Summoning",
 	24:	"Dungeoneering",
 	25:	"Divination",
-	26:	"Invention"
+	26:	"Invention",
+	27: "Archaeology"
 };
 const runemetric_endpoint = "https://apps.runescape.com/runemetrics/profile/profile?activities=12&user=";
 const hiscore_endpoint = "https://secure.runescape.com/m=hiscore/index_lite.ws?player=";
@@ -66,7 +67,7 @@ async function getHiscoreData(user) {
 	let data = {}
 	let value = h_string_arr[0].split(',');
 	data["Total"] = { level: value[1], exp: value[2] };
-	for(let i = 1; i < 28; i++) {
+	for(let i = 1; i < 29; i++) {
 		value = h_string_arr[i].split(',');
 		data[skill_id_lookup[i-1]] = { level: value[1], exp: value[2]};
 	}
@@ -147,7 +148,7 @@ async function calcExpToComp(user) {
 	var totalRemainingExp = 0;
 	let trueMaxSkillsLeft = {}
 
-	let skills120 = ["Invention", "Dungeoneering", "Slayer", "Farming", "Herblore"];
+	let skills120 = ["Invention", "Dungeoneering", "Slayer", "Farming", "Herblore", "Archaeology"];
 	for( var skill in skills ) {
 		let cap = exp_cap;
 		let exp = skills[skill];

@@ -376,6 +376,11 @@ async function handleExpComp(skill = "fishing")
     }
 }
 
+async function handleArchLeaderboard()
+{
+    return "Coming Soon"
+}
+
 async function handleResponse(args, command, raw, name, id, callbacks, isActiveEvent = false) {
     command = normalizeCommand(command);
     if        (command === 'max') {
@@ -426,6 +431,9 @@ async function handleResponse(args, command, raw, name, id, callbacks, isActiveE
     } else if (command === 'makas' || command === 'activewinner')
     {
         return await handleActive("weekly");
+    } else if (command === 'arch')
+    {
+        return await handleArchLeaderboard();
     }
 }
 

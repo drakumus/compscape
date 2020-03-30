@@ -426,7 +426,13 @@ async function getTopSkillExp(skill, timedTable = 'experience', numTop = 3) {
     for ( let i = 0; i < timedRes.length; i++)
     {
         let obj = {};
-        obj[timedRes[i].Name] = expRes[i][skill] - timedRes[i][skill];
+        if(timedTable == 'experience')
+        {
+            obj[timedRes[i].Name] = expRes[i][skill]
+        } else
+        {
+            obj[timedRes[i].Name] = expRes[i][skill] - timedRes[i][skill];
+        }
 
         data.push(obj);
     }
