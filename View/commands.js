@@ -379,6 +379,13 @@ async function handleExpComp(skill = "fishing")
 async function handleArchLeaderboard()
 {
     let msg = "**__Top Exp in Archaeology__**\n"
+    let d = new Date();
+    let min = (d.getMinutes()) - 40;
+    if(min < 0)
+    {
+        min = min + 60;
+    }
+    msg += `Last updated: ${min} minutes ago.\nIf you think your exp is looking a bit low on the leaderboards use the !exp or !epeen command to pull in your latest exp and try the !arch command again.\n`
     let data = await clan.getFormattedTopSkillExp("archaeology", "experience", 25);
     for(let i = 0; i < data.length; i++)
     {
@@ -386,6 +393,8 @@ async function handleArchLeaderboard()
     }
     return msg;
 }
+
+handleArchLeaderboard();
 
 async function handleResponse(args, command, raw, name, id, callbacks, isActiveEvent = false) {
     command = normalizeCommand(command);

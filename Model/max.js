@@ -62,8 +62,6 @@ function getLevelFromExp(exp = 0)
 	}
 }
 
-console.log(getLevelFromExp(96015))
-
 /**
  * Gets the user's data from the runemetric endpoint
  * @param {String} user user's rsn
