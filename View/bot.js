@@ -218,6 +218,17 @@ if (msg.content[0] === '!') {
     var command = args.shift();
 	if(checkForInjection(msg.content.substr(1))) { // have to sanitize my inputs
 		msg.reply("Fuck you.");			 // wouldn't want an injection attack now would we :)
+	} else if (command.toUpperCase() === '!test'.toUpperCase()) {
+		let members = msg.guild.members;
+		for(const [id, member] of members.entries())
+		{
+			console.log(id);
+			for(let i = 0; i < member.roles; i++)
+			{
+				let role = member.roles[i];
+				console.log(role);
+			}
+		}
 	} else if (command.toUpperCase() === '!rank'.toUpperCase()) {
 		getName(args, msg.member.user.id).then(name => {
 			if(name != null) {

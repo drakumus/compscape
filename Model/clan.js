@@ -144,7 +144,7 @@ async function addNewMembers(clan) {
     }
 }
 
-
+addNewMembers("Sorrow Knights");
 
 //addNewMembers("Sorrow Knights")
 // TODO: Create function to remove members that are no longer in a specified clan in the table
