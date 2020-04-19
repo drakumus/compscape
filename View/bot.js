@@ -219,7 +219,7 @@ if (msg.content[0] === '!') {
 	if(checkForInjection(msg.content.substr(1))) { // have to sanitize my inputs
 		msg.reply("Fuck you.");			 // wouldn't want an injection attack now would we :)
 	} else if (command.toUpperCase() === '!diff'.toUpperCase() && (msg.member.roles.has("380345770987225088"))) {
-		let text = "```js\n";
+		let text = "```diff\n";
 		let clan_ranks = ["Owner", "Overseer", "Coordinator", "Organiser", "Administrator", "General", "Captain", "Lieutenant", "Sergeant", "Corporal", "Recruit"];
 		let overseer_roles = ["Overseer", "Founder"];
 		let members = msg.guild.members;
@@ -246,18 +246,23 @@ if (msg.content[0] === '!') {
 				}
 				// /^[a-z0-9-\]+$/gi
 				
-				display_name = display_name.replace(/[^a-z0-9- ]/gi, '') // remove all non-alphanumeric characters
+				display_name = display_name.replace(/[^a-z0-9- _]/gi, '') // remove all non-alphanumeric characters
 				display_name = display_name.trim(); // remove extra whitespace
 				// console.log(`after: ${display_name}`);
+
+				var bad_name = false
 				if(display_name.length === 0 || display_name == undefined)
 				{
+					bad_name = true;
 					text += `- ${member.displayName} name does not follow clan discord name rules.\n`;
 				}
 				
-				if(display_name === "Hi Ben")
+				/*
+				if(display_name === "PkDizzy")
 				{
 					console.log('here');
 				}
+				*/
 
 				// see if the name is in the clan.
 				let data = clan_members[display_name.toLowerCase()];
@@ -275,7 +280,7 @@ if (msg.content[0] === '!') {
 						}
 					}
 					if(!has_rank) text += `- ${display_name} rank doesnt match on discord (should be ${data.rank})\n`;
-				} else
+				} else if (!bad_name) // don't attempt to print if we already know the name is bad
 				{
 					text += `• ${display_name} does not match any current clan members. Was their name changed or were they kicked?\n`;
 				}
