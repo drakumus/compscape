@@ -218,17 +218,72 @@ if (msg.content[0] === '!') {
     var command = args.shift();
 	if(checkForInjection(msg.content.substr(1))) { // have to sanitize my inputs
 		msg.reply("Fuck you.");			 // wouldn't want an injection attack now would we :)
-	} else if (command.toUpperCase() === '!test'.toUpperCase()) {
+	} else if (command.toUpperCase() === '!diff'.toUpperCase() && (msg.member.roles.has("380345770987225088"))) {
+		let text = "```js\n";
+		let clan_ranks = ["Owner", "Overseer", "Coordinator", "Organiser", "Administrator", "General", "Captain", "Lieutenant", "Sergeant", "Corporal", "Recruit"];
+		let overseer_roles = ["Overseer", "Founder"];
 		let members = msg.guild.members;
-		for(const [id, member] of members.entries())
+
+		msg.channel.send("**__DISCORD TO CLAN NAME REPORT__**");
+
+		clan.getClanUserData("Sorrow Knights").then((clan_members) =>
 		{
-			console.log(id);
-			for(let i = 0; i < member.roles; i++)
+			for(const [id, member] of members.entries())
 			{
-				let role = member.roles[i];
-				console.log(role);
+				// if they are a guest don't do anything
+				if(member.roles.has("379290579168788482") || member.roles.has("379290825676554241"))
+				{
+					continue;
+				}
+				// console.log(`before: ${member.displayName}`);
+
+				// cleanup discord display name
+				let display_name = member.displayName;
+				if(display_name.indexOf("|") !== -1)
+				{
+					// grab everything before the |
+					display_name = display_name.match(/[^\|]*/).toString();
+				}
+				display_name = display_name.replace(/\W/g, ' '); // remove all non-alphanumeric characters
+				display_name = display_name.trim(); // remove extra whitespace
+				// console.log(`after: ${display_name}`);
+				if(display_name.length === 0 || display_name == undefined)
+				{
+					text += `- ${member.displayName} name does not follow clan discord name rules.\n`;
+				}
+
+				// see if the name is in the clan.
+				let data = clan_members[display_name.toLowerCase()];
+				if(data !== undefined)
+				{
+					let has_rank = false	
+					for(let [i, role] of member.roles.entries())
+					{
+						if(role.name === data.rank ||
+						   ((data.rank === "Coordinator") && (overseer_roles.indexOf(role.name) !== -1)) ||
+						   ((data.rank === "Admin") && (role.name === "Administrator")))
+						{
+							has_rank = true;
+							break;
+						}
+					}
+					if(!has_rank) text += `- ${display_name} rank doesnt match on discord (should be ${data.rank})\n`;
+				} else
+				{
+					text += `• ${display_name} does not match any current clan members. Was their name changed or were they kicked?\n`;
+				}
+				
+				// send part of report if nearing 2000 character cap
+				if(text.length > 1800)
+				{
+					text += "```";
+					msg.channel.send(text);
+					text = "```diff\n"
+				}
 			}
-		}
+			if(text.length > 0) msg.channel.send(text + "```");
+		});
+		
 	} else if (command.toUpperCase() === '!rank'.toUpperCase()) {
 		getName(args, msg.member.user.id).then(name => {
 			if(name != null) {

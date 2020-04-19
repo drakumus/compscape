@@ -29,7 +29,7 @@ async function getClanData(clan) {
     return arr;
 }
 
-async function getClanMembers(clan) {
+async function getClanMembers(clan = "Sorrow Knights") {
     var arr = await getClanData(clan);
     const clan_member_url = clan_member_endpoint + clan;
     let options = {
@@ -53,7 +53,7 @@ async function getClanMembers(clan) {
     return members;
 }
 
-async function getClanUserData(clan) {
+async function getClanUserData(clan = "Sorrow Knights") {
     var arr = await getClanData(clan);
     var memberData = {}
     for(var i in arr) {
