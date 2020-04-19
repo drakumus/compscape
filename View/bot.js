@@ -244,12 +244,19 @@ if (msg.content[0] === '!') {
 					// grab everything before the |
 					display_name = display_name.match(/[^\|]*/).toString();
 				}
-				display_name = display_name.replace(/\W/g, ' '); // remove all non-alphanumeric characters
+				// /^[a-z0-9-\]+$/gi
+				
+				display_name = display_name.replace(/[^a-z0-9- ]/gi, '') // remove all non-alphanumeric characters
 				display_name = display_name.trim(); // remove extra whitespace
 				// console.log(`after: ${display_name}`);
 				if(display_name.length === 0 || display_name == undefined)
 				{
 					text += `- ${member.displayName} name does not follow clan discord name rules.\n`;
+				}
+				
+				if(display_name === "Hi Ben")
+				{
+					console.log('here');
 				}
 
 				// see if the name is in the clan.
