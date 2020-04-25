@@ -208,6 +208,16 @@ async function getName(args, id) {
 	return name;
 }
 
+async function sendMultipleEmbeds(msg, embeds)
+{
+	for(let i = 0; i < embeds.length; i++)
+	{
+		let result = {};
+		result.embed = embeds[i]
+		await msg.channel.send(result);
+	}
+}
+
 client.on('ready', () => {
   console.log(`${client.user.tag} is up and running!`);
 });
@@ -364,7 +374,7 @@ if (msg.content[0] === '!') {
 		} else {
 			msg.channel.send("Missing time argument");
 		}
-	} else if (command.toUpperCase() === '!startEvent'.toUpperCase() && msg.member.user.id === "135244717901348864") {
+	} else if (command.toUpperCase() === '!startEvent'.toUpperCase() && (msg.member.roles.has("380345770987225088"))) {
 		if(args.length > 0) {
 			var timer = "";
 			for(var i = 0; i < args.length; i++) {
@@ -400,7 +410,7 @@ if (msg.content[0] === '!') {
 		} else {
 			msg.channel.send("Missing time argument");
 		}
-	} else if (command.toUpperCase() === '!endEvent'.toUpperCase() && msg.member.user.id === "135244717901348864") {
+	} else if (command.toUpperCase() === '!endEvent'.toUpperCase() && (msg.member.roles.has("380345770987225088"))) {
 		if(args.length > 0) {
 			var timer = "";
 			for(var i = 0; i < args.length; i++) {
@@ -443,7 +453,41 @@ if (msg.content[0] === '!') {
 				if(typeof result === 'object'){
 					if (result.embed != null) // if embed
 					{
-						msg.channel.send(result);
+						let description = result.embed.description;
+						let embeds = [];
+						let isFirst = true;
+						let length_cut_off = 1500;
+						if(description != undefined && description.length > length_cut_off)
+						{
+							while(description.length > 0)
+							{
+								let embed = new Discord.RichEmbed();
+								let piece = description.substring(0, length_cut_off);
+								description = description.substring(length_cut_off, msg.length);
+								
+								// grab till next new line
+								let newline_index = description.indexOf('\n') > 0 ? description.indexOf('\n')+1 : 0;
+								piece += description.substring(0, newline_index);
+								description = description.substring(newline_index);
+
+								if(isFirst)
+								{
+									result.embed.description = piece;
+									embeds.push(result.embed);
+									isFirst = false;
+								} else
+								{
+									embed.description = piece;
+									embeds.push(embed);
+								}
+							}
+							
+							
+							sendMultipleEmbeds(msg, embeds);
+						} else
+						{
+							msg.channel.send(result);
+						}
 					} else // if epeen
 					{
 						msg.channel.send(result.message, {files: result.files});

@@ -256,6 +256,12 @@ async function handleThresh(thresh = 7, timePeriod = "weekly") {
             message += `**${count})** ${i}\n`
             count++;
         }
+        
+    }
+
+    if(message.length > 1700)
+    {
+        return message; // handle length outside
     }
 
     let embed = new Discord.RichEmbed()
@@ -428,6 +434,8 @@ async function handleResponse(args, command, raw, name, id, callbacks, isActiveE
         return await handleEPeen(name, callbacks.achieves);
     } else if (command === '7mil') {
         return await handleThresh(7, "weekly");
+    } else if (command === '30mil' || command === 'dxp') {
+        return await handleThresh(30, "event");
     } else if (command === 'skillerz677') {
         return await handleExp('skillerz677', callbacks.achieves);
     } else if (command === 'leaderboard' || command === 'leaderboards') {
