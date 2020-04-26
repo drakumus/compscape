@@ -478,6 +478,7 @@ if (msg.content[0] === '!') {
 								} else
 								{
 									embed.description = piece;
+									embed.color = result.embed.color;
 									embeds.push(embed);
 								}
 							}

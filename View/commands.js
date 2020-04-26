@@ -259,11 +259,6 @@ async function handleThresh(thresh = 7, timePeriod = "weekly") {
         
     }
 
-    if(message.length > 1700)
-    {
-        return message; // handle length outside
-    }
-
     let embed = new Discord.RichEmbed()
     .setTitle(`Clannies with 7 million exp this week:`)
     .setThumbnail('https://runescape.wiki/images/f/f2/Bond_detail.png?d4bdb')
