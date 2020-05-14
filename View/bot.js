@@ -140,11 +140,33 @@ var hourly_update = schedule.scheduleJob('30 * * * *', function(){
 // at 0 gmt
 var before_reset_job = schedule.scheduleJob('59 23 * * 7', function() {
 	commands.handleThresh(7, "weekly").then (res => {
+		/*
 		if(typeof res != "undefined")
 		{
 			res.embeds = [];
 			res.embeds[0] = res.embed;
 			spam_hook.send(res);
+		}*/
+		if (res.length > 0)
+		{
+			if(res.length > 2048)
+			{
+				let lines = result.split("\n");
+				let text = "";
+				for(let i = 0; i < lines.length; i++)
+				{
+					text += lines[i] + "\n"
+					if(text.length > 1500)
+					{
+						spam_hook.send(text);
+						text = "";
+					}
+				}
+				if(text.length > 0) spam_hook.send(text);
+			} else
+			{
+				spam_hook.send(res);
+			}
 		}
 	});
 });
@@ -497,7 +519,24 @@ if (msg.content[0] === '!') {
 					}
 				} else if (typeof result != 'undefined') { // if text message
 					if (result.length > 0)
+					{
+						if(result.length > 2048)
+						{
+							let lines = result.split("\n");
+							let text = "";
+							for(let i = 0; i < lines.length; i++)
+							{
+								text += lines[i] + "\n"
+								if(text.length > 1500)
+								{
+									msg.channel.send(text);
+									text = "";
+								}
+							}
+							if(text.length > 0) msg.channel.send(text);
+						}
 						msg.channel.send(result);
+					}
 				}
 			});
 		});

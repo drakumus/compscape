@@ -247,8 +247,8 @@ function makeEpeen(percentile) {
 
 async function handleThresh(thresh = 7, timePeriod = "weekly") {
     let timedTotal = await clan.calculateClanTimedTotalExp('Sorrow Knights', timePeriod, "all");
+    let message = `Clannies with ${thresh} million exp this ${timePeriod}\n`;
     thresh = thresh * 1000000;
-    let message = ``;
     let count = 1;
     
     for (i in timedTotal) {
@@ -259,12 +259,15 @@ async function handleThresh(thresh = 7, timePeriod = "weekly") {
         
     }
 
+    /*
     let embed = new Discord.RichEmbed()
     .setTitle(`Clannies with 7 million exp this week:`)
     .setThumbnail('https://runescape.wiki/images/f/f2/Bond_detail.png?d4bdb')
     .setColor(0x34eb5b)
     .setDescription(message);
     return {embed};
+    */
+   return message;
 }
 
 async function handleActive( timePeriod = "weekly") {
