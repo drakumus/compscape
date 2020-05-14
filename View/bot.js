@@ -91,10 +91,12 @@ async function makeUserSkillAchievementAnnouncement(new99sAnd120s) {
 
 	let embeds = [];
 	for(name in new99sAnd120s){
+		/*
 		if(new99sAnd120s[name]['isNewMax'] == true)
 		{
 			embeds.push(annmsg.makeMaxAnnouncementMessage(name));
 		}
+		*/
 		for(let skill in new99sAnd120s[name]['99s']){
 			let skillName = new99sAnd120s[name]['99s'][skill];
 			embeds.push(annmsg.makeAchAnnouncementMessage(skillName, name, 99));

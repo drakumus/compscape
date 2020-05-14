@@ -281,6 +281,10 @@ async function calculateClanTimedTotalExp(clan = "Sorrow Knights", timeSlot = "d
         case "monthly":
             timed_data = await db.getClanData(clan, 'monthly');
             break;
+	case "event":
+            timed_data = await db.getClanData(clan, 'event');
+            break;
+	    
     }
     
     var memberTotals = [];
