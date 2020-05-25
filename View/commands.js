@@ -253,7 +253,7 @@ async function handleThresh(thresh = 7, timePeriod = "weekly") {
     
     for (i in timedTotal) {
         if(timedTotal[i] > thresh) {
-            message += `**${count})** ${i}\n`
+            message += `**${count})** ${i} @ ${timedTotal[i].toLocaleString()}\n`
             count++;
         }
         
@@ -397,8 +397,6 @@ async function handleArchLeaderboard()
     }
     return msg;
 }
-
-handleArchLeaderboard();
 
 async function handleResponse(args, command, raw, name, id, callbacks, isActiveEvent = false) {
     command = normalizeCommand(command);
