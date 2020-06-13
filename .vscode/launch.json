@@ -9,7 +9,13 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
+            "name": "Clan",
+            "program": "${workspaceFolder}\\Model\\clan.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Bot",
             "program": "${workspaceFolder}\\View\\bot.js"
         }
     ]

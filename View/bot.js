@@ -17,6 +17,7 @@ var fs = require('fs');
 const secret = JSON.parse(fs.readFileSync("./View/secret.json", { encoding: 'utf8' }));
 const spam_hook = new Discord.WebhookClient(secret.spam_hook_id,secret.spam_hook_token);
 const ach_hook = new Discord.WebhookClient(secret.ach_hook_id, secret.ach_hook_token);
+const slash_hook = new Discord.WebhookClient(secret.slash_hook_id, secret.slash_hook_token);
 const client = new Discord.Client();
 var isActiveEvent = false;
 
@@ -132,6 +133,11 @@ async function makeUserSkillAchievementAnnouncement(new99sAnd120s) {
 var hourly_update = schedule.scheduleJob('30 * * * *', function(){
 	new Promise(() => {
 		clan.updateClan('Sorrow Knights').then((new99sAnd120s) =>{
+			if(new99sAnd120s.changed !== "")
+			{
+				slash_hook.send(new99sAnd120s.changed);
+			}
+			delete new99sAnd120s.changed;
 			makeUserSkillAchievementAnnouncement(new99sAnd120s);
 		});
 	});
@@ -246,7 +252,7 @@ client.on('ready', () => {
   console.log(`${client.user.tag} is up and running!`);
 });
 
-client.on('message', msg => {
+client.on('message', async msg => {
 if (msg.content[0] === '!') {
     var args = msg.content.split(" ");
     var command = args.shift();
@@ -260,76 +266,77 @@ if (msg.content[0] === '!') {
 
 		msg.channel.send("**__DISCORD TO CLAN NAME REPORT__**");
 
-		clan.getClanUserData("Sorrow Knights").then((clan_members) =>
+		let clan_members = await clan.getClanUserData("Sorrow Knights");
+		for(const [id, member] of members.entries())
 		{
-			for(const [id, member] of members.entries())
+			// if they are a guest don't do anything
+			if(member.roles.has("379290579168788482") || member.roles.has("379290825676554241"))
 			{
-				// if they are a guest don't do anything
-				if(member.roles.has("379290579168788482") || member.roles.has("379290825676554241"))
-				{
-					continue;
-				}
-				// console.log(`before: ${member.displayName}`);
-
-				// cleanup discord display name
-				let display_name = member.displayName;
-				if(display_name.indexOf("|") !== -1)
-				{
-					// grab everything before the |
-					display_name = display_name.match(/[^\|]*/).toString();
-				}
-				// /^[a-z0-9-\]+$/gi
-				
-				display_name = display_name.replace(/[^a-z0-9- _]/gi, '') // remove all non-alphanumeric characters
-				display_name = display_name.trim(); // remove extra whitespace
-				// console.log(`after: ${display_name}`);
-
-				var bad_name = false
-				if(display_name.length === 0 || display_name == undefined)
-				{
-					bad_name = true;
-					text += `- ${member.displayName} name does not follow clan discord name rules.\n`;
-				}
-				
-				/*
-				if(display_name === "PkDizzy")
-				{
-					console.log('here');
-				}
-				*/
-
-				// see if the name is in the clan.
-				let data = clan_members[display_name.toLowerCase()];
-				if(data !== undefined)
-				{
-					let has_rank = false	
-					for(let [i, role] of member.roles.entries())
-					{
-						if(role.name === data.rank ||
-						   ((data.rank === "Coordinator") && (overseer_roles.indexOf(role.name) !== -1)) ||
-						   ((data.rank === "Admin") && (role.name === "Administrator")))
-						{
-							has_rank = true;
-							break;
-						}
-					}
-					if(!has_rank) text += `- ${display_name} rank doesnt match on discord (should be ${data.rank})\n`;
-				} else if (!bad_name) // don't attempt to print if we already know the name is bad
-				{
-					text += `• ${display_name} does not match any current clan members. Was their name changed or were they kicked?\n`;
-				}
-				
-				// send part of report if nearing 2000 character cap
-				if(text.length > 1800)
-				{
-					text += "```";
-					msg.channel.send(text);
-					text = "```diff\n"
-				}
+				continue;
 			}
-			if(text.length > 0) msg.channel.send(text + "```");
-		});
-		
+			// console.log(`before: ${member.displayName}`);
+
+			// cleanup discord display name
+			let display_name = member.displayName;
+			if(display_name.indexOf("|") !== -1)
+			{
+				// grab everything before the |
+				display_name = display_name.match(/[^\|]*/).toString();
+			}
+			// /^[a-z0-9-\]+$/gi
+			
+			display_name = display_name.replace(/[^a-z0-9- _]/gi, '') // remove all non-alphanumeric characters
+			display_name = display_name.trim(); // remove extra whitespace
+			// console.log(`after: ${display_name}`);
+
+			var bad_name = false
+			if(display_name.length === 0 || display_name == undefined)
+			{
+				bad_name = true;
+				text += `- ${member.displayName} name does not follow clan discord name rules.\n`;
+			}
+			
+			/*
+			if(display_name === "PkDizzy")
+			{
+				console.log('here');
+			}
+			*/
+
+			// see if the name is in the clan.
+			let data = clan_members[display_name.toLowerCase()];
+			if(data !== undefined)
+			{
+				let has_rank = false	
+				for(let [i, role] of member.roles.entries())
+				{
+					if(role.name === data.rank ||
+							((data.rank === "Coordinator") && (overseer_roles.indexOf(role.name) !== -1)) ||
+							((data.rank === "Admin") && (role.name === "Administrator")))
+					{
+						has_rank = true;
+						break;
+					}
+				}
+				if(!has_rank) text += `- ${display_name} rank doesnt match on discord (should be ${data.rank})\n`;
+			} else if (!bad_name) // don't attempt to print if we already know the name is bad
+			{
+				//let closest = await clan.getClosestLeveledPlayerExp("Sorrow Knights", display_name, true);
+				text += `• ${display_name} does not match any current clan members. Was their name changed or were they kicked?\n`;
+				//text += `  (Beta) This is likely: ${closest.name}.\n`;
+				//text += closest.name !== null ? `  Check here: https://secure.runescape.com/m=hiscore/compare?user1=${display_name}&user2=${closest.name}\n` : '';
+			}
+			
+			// send part of report if nearing 2000 character cap
+			if(text.length > 1800)
+			{
+				text += "```";
+				msg.channel.send(text);
+				text = "```diff\n"
+			}
+		}
+		if(text.length > 0) msg.channel.send(text + "```");
+
 	} else if (command.toUpperCase() === '!rank'.toUpperCase()) {
 		getName(args, msg.member.user.id).then(name => {
 			if(name != null) {

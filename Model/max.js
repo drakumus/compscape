@@ -266,5 +266,6 @@ module.exports = {
 	getHiscoreData,
 	getALog,
 	getUserPNG,
-	getLevelFromExp
+	getLevelFromExp,
+	extractSkillData
 }

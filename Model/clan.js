@@ -120,12 +120,6 @@ async function addNewMembers(clan) {
     var dbMembers = await db.getClanMembers(clan);
     var newMembers = members.filter(val => !dbMembers.includes(val));
     var goneMembers = dbMembers.filter(val => !members.includes(val));
-
-    // figure out best time to run this. (after name change check/fix?)
-    
-    if(goneMembers.length > 0) {
-        db.removeUsers(goneMembers);
-    }
     
     if(newMembers.length > 0) {
         // for future use
@@ -142,9 +136,25 @@ async function addNewMembers(clan) {
         await db.addExpUsers(newMembers, 'weekly');
         await db.addExpUsers(newMembers, 'monthly');
     }
+
+    // figure out best time to run this. (after name change check/fix?)
+    let nameChangeMessage = "";
+    for(let i = 0; i < goneMembers.length; i++)
+    {
+        let closest = await getClosestLeveledPlayerFromNewUsers(clan, goneMembers[i], newMembers, false);
+        if(closest != null)
+        {
+            nameChangeMessage += `${goneMembers[i]} to ${closest.name}\n`;
+        }
+    }
+    if(goneMembers.length > 0) {
+        db.removeUsers(goneMembers);
+    }
+
+    return nameChangeMessage;
 }
 
-addNewMembers("Sorrow Knights");
+//addNewMembers("Sorrow Knights");
 
 //addNewMembers("Sorrow Knights")
 // TODO: Create function to remove members that are no longer in a specified clan in the table
@@ -281,7 +291,7 @@ async function calculateClanTimedTotalExp(clan = "Sorrow Knights", timeSlot = "d
         case "monthly":
             timed_data = await db.getClanData(clan, 'monthly');
             break;
-	case "event":
+	    case "event":
             timed_data = await db.getClanData(clan, 'event');
             break;
 	    
@@ -485,6 +495,202 @@ async function getFormattedTopSkillExp(skill, timedTable = 'experience', numTop 
     return top;
 }
 
+async function getClosestLeveledPlayerFromNewUsers(_clan, _old_user, _new_users) {
+    var current_data = await db.getClanData(_clan);
+    var user_data = current_data.filter(player_data => player_data.name === _old_user);
+    if(user_data.length > 1)
+    {
+        console.log("Error: invalid number of matches for user: " + user_data.length)
+        return null;
+    } else if(user_data.length === 0)
+    {
+        console.log("Error: No users found by that name")
+        return null;
+    } else
+    {
+        user_data = user_data[0];
+    }
+    var new_users_data = current_data.filter(player_data => _new_users.indexOf(player_data.name) > -1);
+    var closest_user_data = {};
+
+    const non_skill_fields = ['clan', 'name', 'id', 'user_id']
+    let closer_user_found = false;
+    for(new_user_data of new_users_data)
+    {
+        var num_clan_user_skills_closer = 0;
+        var num_closest_user_skills_closer = 0;
+
+        let has_less_exp = false;
+        for(field in new_user_data)
+        {
+            // make sure we don't compare fields that don't associate with a skill.
+            if(non_skill_fields.indexOf(field) > -1)
+            {
+                continue;
+            }
+
+            // We expect user_data to be smaller since we're searching for the name the user likely changed to which will have more recent, thus greater exp.
+            let closest_user_diff = closest_user_data[field] - user_data[field];
+            let clan_user_diff    = new_user_data[field]    - user_data[field];
+
+            if(clan_user_diff < 0)
+            {
+                // can't be match since the older exp has less exp than the current. exp loss isn't possible
+                has_less_exp = true;
+                break; 
+            }
+
+            if(closest_user_diff < clan_user_diff && closest_user_diff >= 0)
+            {
+                num_closest_user_skills_closer++;
+            } else
+            {
+                num_clan_user_skills_closer++;
+            }
+        }
+
+        // don't attempt to check if user is closer if they have less exp
+        if(has_less_exp)
+        {
+            continue;
+        }
+
+        if(num_clan_user_skills_closer > num_closest_user_skills_closer)
+        {
+            // clan user has skills closer than current closest, replace current closest
+            // console.log(`${new_user_data.name} was found with ${num_clan_user_skills_closer} matches vs ${num_closest_user_skills_closer}`)
+            closer_user_found = true;
+            closest_user_data = new_user_data;
+        }
+    }
+
+    if(closer_user_found)
+    {
+        return closest_user_data;
+    } else
+    {
+        // no canidate found.
+        // can only happen if there's no other user with higher exp in every skill
+        return null;
+    }
+}
+
+async function getClosestLeveledPlayerExp(_clan, _user_runescape_name, _use_hiscores = false) {
+    var current_data = await db.getClanData(_clan);
+    var user_data = current_data.filter(player_data => player_data.name === _user_runescape_name);
+
+    if(!_use_hiscores)
+    {
+        // make sure there's an exact match on the user in the database. Otherwise throw errors
+        if(user_data.length > 1)
+        {
+            console.log("Error: invalid number of matches for user: " + user_data.length)
+            return null;
+        } else if(user_data.length === 0)
+        {
+            console.log("Error: No users found by that name")
+            return null;
+        } else
+        {
+            user_data = user_data[0];
+        }
+    } else
+    {
+        user_data = {}
+        try {
+            raw_data = await max.extractSkillData(_user_runescape_name);
+        } catch (err) {
+            // failed to find user
+            return null;
+        }
+        if(raw_data === {})
+        {
+            // user doesn't exist
+            return undefined;
+        }
+        for(skill in raw_data)
+        {
+            user_data[skill.toLowerCase()] = raw_data[skill];
+        }
+        user_data['name'] = _user_runescape_name;
+    }
+
+    // If it's the first user in the database don't compare them against themselves.
+    var closest_user_data = {};
+
+    const non_skill_fields = ['clan', 'name', 'id', 'user_id']
+    let closer_user_found = false;
+    let self_found = false; // not sure what to do with this yet
+    for(clan_user_data of current_data)
+    {
+        /*
+        if(_user_runescape_name === clan_user_data.name) {
+            // don't mark same user as closest user
+            self_found = true;
+            continue;
+        }
+        */
+        if(clan_user_data.name === "Mr Traumatik") {
+            console.log("here");
+        }
+        var num_clan_user_skills_closer = 0;
+        var num_closest_user_skills_closer = 0;
+
+        let has_less_exp = false;
+        for(field in clan_user_data)
+        {
+            // make sure we don't compare fields that don't associate with a skill.
+            if(non_skill_fields.indexOf(field) > -1)
+            {
+                continue;
+            }
+
+            // We expect user_data to be smaller since we're searching for the name the user likely changed to which will have more recent, thus greater exp.
+            let closest_user_diff = closest_user_data[field] - user_data[field];
+            let clan_user_diff    = clan_user_data[field]    - user_data[field];
+
+            if(clan_user_diff < 0)
+            {
+                // can't be match since the older exp has less exp than the current. exp loss isn't possible
+                has_less_exp = true;
+                break; 
+            }
+
+            if(closest_user_diff < clan_user_diff && closest_user_diff >= 0)
+            {
+                num_closest_user_skills_closer++;
+            } else
+            {
+                num_clan_user_skills_closer++;
+            }
+        }
+
+        // don't attempt to check if user is closer if they have less exp
+        if(has_less_exp)
+        {
+            continue;
+        }
+
+        if(num_clan_user_skills_closer > num_closest_user_skills_closer)
+        {
+            // clan user has skills closer than current closest, replace current closest
+            console.log(`${clan_user_data.name} was found with ${num_clan_user_skills_closer} matches vs ${num_closest_user_skills_closer}`)
+            closer_user_found = true;
+            closest_user_data = clan_user_data;
+        }
+    }
+
+    if(closer_user_found)
+    {
+        return closest_user_data;
+    } else
+    {
+        // no canidate found.
+        // can only happen if there's no other user with higher exp in every skill
+        return null;
+    }
+}
+
 /**
  * Performs a dif on the total exp for the experience table and a given time table (daily, weekly, monthly).
  * The dif list is then sorted and the numTop users are presented.
@@ -499,7 +705,7 @@ async function calculateTopExp(clan, timeSlot, numTop, catagory = "all", exclude
                        await  db.getClanData(clan, "end"):
                        await db.getClanData(clan);
     var timed_data = await db.getClanData(clan, timeSlot);
-    var memberTotals = {}; // where the fuck did the rest go?
+    var memberTotals = {};
     for(var i in timed_data) {
         var name = timed_data[i].name;
         var currentTotal, timedTotal;
@@ -610,8 +816,9 @@ async function calculateTopExpEvent(clan, numTop, type = "all") {
  */
 async function updateClan(clan = 'Sorrow Knights') {
     var members = await getClanMembers(clan);
-    await addNewMembers(clan);
+    let changed = await addNewMembers(clan);
     var new99sAnd120s = await db.updateExpUsers(members);
+    new99sAnd120s["changed"] = changed;
     return new99sAnd120s;
 }
 
@@ -672,5 +879,6 @@ module.exports = {
     calculateClanAllTimedUserRank,
     calculateClanTimedTotalExp,
     getTopSkillExp,
-    getFormattedTopSkillExp
+    getFormattedTopSkillExp,
+    getClosestLeveledPlayerExp
 }
