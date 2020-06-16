@@ -139,6 +139,13 @@ async function addNewMembers(clan) {
 
     // figure out best time to run this. (after name change check/fix?)
     let nameChangeMessage = "";
+    if(goneMembers.length > 0)
+    {
+        console.log("goneMembers:")
+        console.log(goneMembers);
+        console.log("newMembers");
+        console.log(newMembers);
+    }
     for(let i = 0; i < goneMembers.length; i++)
     {
         let closest = await getClosestLeveledPlayerFromNewUsers(clan, goneMembers[i], newMembers, false);
@@ -494,6 +501,8 @@ async function getFormattedTopSkillExp(skill, timedTable = 'experience', numTop 
 
     return top;
 }
+
+getClosestLeveledPlayerFromNewUsers("Sorrow Knights", "Z0CI", ["iSlash", "Mr Traumatik"])
 
 async function getClosestLeveledPlayerFromNewUsers(_clan, _old_user, _new_users) {
     var current_data = await db.getClanData(_clan);

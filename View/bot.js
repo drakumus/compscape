@@ -135,6 +135,7 @@ var hourly_update = schedule.scheduleJob('30 * * * *', function(){
 		clan.updateClan('Sorrow Knights').then((new99sAnd120s) =>{
 			if(new99sAnd120s.changed !== "")
 			{
+				console.log(new99sAnd120s.changed);
 				slash_hook.send(new99sAnd120s.changed);
 			}
 			delete new99sAnd120s.changed;
@@ -186,14 +187,6 @@ var daily_job = schedule.scheduleJob('0 0 * * *', function(){
 		clan.setDailyXP();
 	});
 
-	commands.handleThresh().then (res => {
-		if(typeof res != "undefined")
-		{
-			res.embeds = [];
-			res.embeds[0] = res.embed;
-			spam_hook.send(res);
-		}
-	})
 	// send stuff to discord channel
 });
 
@@ -216,11 +209,13 @@ var monthly_job = schedule.scheduleJob('0 0 1 * *', function(){
 	// send stuff to discord channel
 });
 
+/*
 var prif_job = schedule.scheduleJob('1 * * * *', function(){
 	scraper.getHour().then(res => {
 		spam_hook.send("The Voice of Seren is now active in " + res);
 	})
 })
+*/
 
 async function getName(args, id) {
 	var name = null;
