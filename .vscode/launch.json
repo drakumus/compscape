@@ -24,6 +24,12 @@
             "request": "launch",
             "name": "Scraper",
             "program": "${workspaceFolder}\\Model\\scraper.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Vis",
+            "program": "${workspaceFolder}\\Model\\vis.js"
         }
     ]
 }

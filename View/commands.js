@@ -3,6 +3,7 @@ var clan = require('../Model/clan.js');
 const annmsg = require('./announcementmsg.js');
 var table = require('table').table;
 const Discord = require('discord.js');
+var vis = require('../Model/vis.js');
 
 const INVALID_USERNAME = "The username you tried to use could not be found. Use *!myrsn YOUR NAME* to set your username to use commands without a name."
 
@@ -398,6 +399,12 @@ async function handleArchLeaderboard()
     return msg;
 }
 
+async function handleVis()
+{  
+    let msg = await vis.getVis();
+    return msg;
+}
+
 async function handleResponse(args, command, raw, name, id, callbacks, isActiveEvent = false) {
     command = normalizeCommand(command);
     if        (command === 'max') {
@@ -453,6 +460,9 @@ async function handleResponse(args, command, raw, name, id, callbacks, isActiveE
     } else if (command === 'arch')
     {
         return await handleArchLeaderboard();
+    } else if (command === 'viswax')
+    {
+        return await handleVis();
     }
 }
 
